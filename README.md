@@ -13,7 +13,7 @@
 | [02. 개발 계획](docs/02-development-plan.md) | 준비, 소스 구조, 개발 단계, 테스트, 배포, 라이선스 |
 | [03. 기능 벤치마크](docs/03-feature-benchmark.md) | 반디집 대비 7-Zip 기능 비교 (#1–#36), 우선순위 |
 | [04. GUI 레퍼런스](docs/04-gui-reference.md) | 화면 S1–S9 명세, 디자인 원칙·토큰, UI 기술 선택지 |
-| [GUI 목업 소스](docs/gui-mockups/) | 디자인 캔버스 아트보드 원본 (`.dc.html`) |
+| [GUI 디자인 원본](design/) | Claude Design 프로젝트 폴더 (`canvas.json` + 화면별 `.dc.html`), 형식 설명 포함 |
 
 ## 우선순위 요약
 

@@ -2,9 +2,22 @@
 
 반디집의 화면 구성 **패턴**을 참고해 새로 설계한 j-zip GUI 명세. 반디집의 화면·아이콘·브랜딩은 복제하지 않는다.
 
-- 디자인 캔버스(비공개): https://claude.ai/artifact/YXWMXQRdYEgcDggGNiRicM
-- 아트보드 원본: [`gui-mockups/`](gui-mockups/) — 캔버스 런타임용 `.dc.html` 파일이라 브라우저에서 단독으로 열면 그대로 렌더링되지 않는다
+- **디자인 원본**: [`../design/`](../design/) — Claude Design 프로젝트 폴더(`project/canvas.json` + 화면별 `.dc.html`). 파일 형식, 아트보드 목록, 수정 규칙은 [`design/README.md`](../design/README.md)에 정리되어 있어 캔버스 없이도 읽고 수정할 수 있다
+- 이 문서는 디자인 원본 없이도 화면 구성을 이해할 수 있도록 모든 화면을 글로 명세한다
 - 각 화면의 `#번호`는 [03. 기능 벤치마크](03-feature-benchmark.md)의 기능 번호
+
+| 화면 | 디자인 파일 |
+|---|---|
+| 기능 → 화면 매핑 | `design/project/FeatureMap.dc.html` |
+| S1 메인 탐색 창 | `design/project/Main.dc.html` |
+| S2 압축 풀기 | `design/project/Extract.dc.html` |
+| S3 새로 압축 | `design/project/Compress.dc.html` |
+| S4 진행 / 완료 알림 | `design/project/Progress.dc.html` |
+| S5 파일명 인코딩 | `design/project/Encoding.dc.html` |
+| S6 암호 입력 / 관리자 | `design/project/Password.dc.html` |
+| S7 탐색기 우클릭 메뉴 | `design/project/ContextMenu.dc.html` |
+| S8 설정 | `design/project/Settings.dc.html` |
+| S9 테스트 결과 / 분할 파일 | `design/project/Error.dc.html` |
 
 ## 설계 원칙
 

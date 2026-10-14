@@ -1,0 +1,38 @@
+{
+  "v": 3,
+  "createdOnFiles": {"at": "2026-10-14T01:56:25.218Z", "v": 1},
+  "attachments": {},
+  "title": "7-Zip GUI 레퍼런스",
+  "launch": {"view": "canvas"},
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 1200, "h": 760, "title": "S1 · 메인 탐색 창"},
+    "FeatureMap.dc.html": {"x": 1280, "y": 0, "w": 960, "h": 1000, "title": "기능 → 화면 매핑"},
+    "Extract.dc.html": {"x": 0, "y": 1400, "w": 640, "h": 580, "title": "S2 · 압축 풀기"},
+    "Compress.dc.html": {"x": 720, "y": 1400, "w": 720, "h": 760, "title": "S3 · 새로 압축", "is_interactive": true},
+    "Progress.dc.html": {"x": 1520, "y": 1400, "w": 560, "h": 480, "title": "S4 · 진행 / 완료 알림"},
+    "Encoding.dc.html": {"x": 2160, "y": 1400, "w": 640, "h": 500, "title": "S5 · 파일명 인코딩"},
+    "Password.dc.html": {"x": 0, "y": 2560, "w": 880, "h": 500, "title": "S6 · 비밀번호 / 관리자"},
+    "ContextMenu.dc.html": {"x": 960, "y": 2560, "w": 760, "h": 540, "title": "S7 · 탐색기 우클릭 메뉴"},
+    "Settings.dc.html": {"x": 1800, "y": 2560, "w": 920, "h": 620, "title": "S8 · 설정"},
+    "Error.dc.html": {"x": 2800, "y": 2560, "w": 760, "h": 480, "title": "S9 · 테스트 결과 / 분할 파일"}
+  },
+  "order": [
+    "Main.dc.html",
+    "FeatureMap.dc.html",
+    "Extract.dc.html",
+    "Compress.dc.html",
+    "Progress.dc.html",
+    "Encoding.dc.html",
+    "Password.dc.html",
+    "ContextMenu.dc.html",
+    "Settings.dc.html",
+    "Error.dc.html"
+  ],
+  "notes": {
+    "row1": {"x": 0, "y": -280, "text": "1. 메인 창과 기능 인덱스", "kind": "title1", "maxW": 2240},
+    "row2": {"x": 0, "y": 1120, "text": "2. 압축 · 해제 흐름", "kind": "title1", "maxW": 2800},
+    "row3": {"x": 0, "y": 2280, "text": "3. 보안 · 셸 통합 · 설정", "kind": "title1", "maxW": 3560}
+  },
+  "designSystems": []
+}
