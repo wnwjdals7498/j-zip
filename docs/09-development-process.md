@@ -11,7 +11,7 @@ j-zip은 코딩 에이전트가 구현한다. 그래서 **무엇을 근거로 �
 | 명세 주도 | 모든 작업은 [05. 기능 세부 명세](05-feature-specs/README.md)의 요구사항 ID(`FR-17-5` 등)나 [06. GUI 명세서](06-gui-spec.md)의 요소 ID(`S2-04` 등)에서 출발한다. 명세에 없는 동작을 만들지 않는다 |
 | 증거로 완료 | "완료"는 주장이 아니라 증거다. 수용 기준(명세 8절)마다 정해진 종류의 증거가 있어야 완료로 본다 |
 | 작성과 검토 분리 | 코드를 쓴 에이전트는 자기 작업을 승인하지 않는다. 검토와 검증은 별도 에이전트(별도 컨텍스트)가 한다 |
-| 작게 | 작업 하나 = PR 하나 = 리뷰 가능한 크기(대략 변경 400줄 이하, 생성 파일 제외) |
+| 작게 | 작업 하나 = PR 하나 = 리뷰 가능한 크기(대략 변경 400줄 이하). 줄 수에서 빼는 것: 도구가 생성한 파일, 테스트 데이터 파일과 생성한 코퍼스, 외부 소스 가져오기(upstream subtree 등), `work/handoff/**`·`work/evidence/**`(12 4.5의 기록 전용 경로) |
 | 사실만 | 7-Zip 내부 동작은 [research](research/7zip-26.04-source-facts.md)나 실제 소스로 확인한 것만 근거로 쓴다. 모르면 "미결"로 남기고 결정 기록(ADR)을 요청한다 |
 
 ---
@@ -36,8 +36,8 @@ j-zip/
 │  ├─ integration/       코퍼스 기반 통합 테스트 — 영구
 │  ├─ perf/              성능 측정 하네스 — 영구 (SP-2 등에서 승격)
 │  ├─ corpus/            샘플 아카이브 (작은 파일만 커밋, 큰 파일은 생성 스크립트)
-│  └─ scratch/           탐색용 테스트 — 단계 종료 시 정리
-├─ spikes/               시제품 코드 — 단계 종료 시 삭제
+│  └─ scratch/           탐색용 테스트 — 단계 종료 시 정리(`.gitkeep`만 남김)
+├─ spikes/               시제품 코드 — 단계 종료 시 삭제(`.gitkeep`만 남김)
 ├─ tools/
 │  ├─ build.ps1          빌드 진입점 (MSBuild + nmake, 11절)
 │  ├─ gate/              작업·단계 검사 스크립트
@@ -54,9 +54,15 @@ j-zip/
 7-Zip 원본 수정 규칙:
 
 - 원본 파일을 고쳐야 하면 바뀐 부분을 `// JZIP-PATCH(<작업 ID>): <이유>` … `// JZIP-PATCH-END` 로 감싸고 `upstream/PATCHES.md`에 한 줄로 기록한다.
-- 원본 파일은 작업 카드의 "허용 원본 파일" 행에 **파일 단위로 명시된 것만** 고칠 수 있다. 목록에 없는 원본 파일을 고쳐야 하면 작업을 멈추고 메모에 기록한다.
+- 원본 파일은 작업 카드 5절의 "허용 upstream 파일"에 **파일 단위로 명시된 것만** 고칠 수 있다. 목록에 없는 원본 파일을 고쳐야 하면 작업을 멈추고 RESULT 보고서(`BLOCKED`)에 기록한다.
 - 원본 패치는 `jzip-shared`·`jzip-win` 호출(훅)과 그 결과 전달에 그친다. 판단 로직 자체는 `src/shared/`, Win32 포트 구현은 `src/shared-win/`에 둔다([08](08-architecture.md) 1절).
 - 가능하면 원본은 고치지 않고 `src/` 쪽에 새 파일을 만든다. 패치는 업스트림 갱신 때 충돌 지점이 된다.
+
+원본 가져오기(예외 규칙):
+
+- upstream subtree(`git subtree add`·`pull`)와 `third_party/`에 소스·데이터를 들이는 일은 **오케스트레이터만** 하는 "원본 가져오기"다([12](12-agent-orchestration.md) 4.10). 외부 구현·검토 모델은 네트워크를 쓰지 않으므로 원본을 직접 내려받지 않는다.
+- 작업 카드의 핸드오프 전 단계에 적힌 **고정된 원본**(저장소, 태그, 커밋 SHA 예: `ip7z/7zip` 태그 `26.04` 커밋 `9128b80…`, LZ4 `v1.10.0`)에서만 가져온다. 가져온 뒤 카드의 해시와 대조해 검증하고 `RUNLOG.md`에 기록한다. 카드에 없는 원본은 가져오지 않는다.
+- 가져온 뒤의 일(`PATCHES.md`, `VERSIONS.md`, `THIRD_PARTY_NOTICES.md`, 검사 스크립트)은 구현 모델이 한다.
 
 ---
 
@@ -66,7 +72,7 @@ j-zip/
 
 | 단계 | 내용 | 종료 조건 (게이트) |
 |---|---|---|
-| **G0 골격** | 레포 구조, 7-Zip subtree, `jzip-shared`·`jzip-win` 빈 라이브러리(`-mt`·`-md` 두 변형) + nmake 연결, MSBuild 솔루션, CI 3종, 빌드 구성 4종([07](07-tech-stack.md) 5절), 로그 뼈대([10](10-logging-evidence-operations.md)), 테스트 프레임워크, 코퍼스 v0, 11절 도구 | 3.2의 G0 게이트 항목 전부 |
+| **G0 골격** | 핸드오프 경로 스모크 테스트(`G0-INFRA-T16`, [12](12-agent-orchestration.md) 9절), 레포 구조, 7-Zip subtree, `jzip-shared`·`jzip-win` 빈 라이브러리(`-mt`·`-md` 두 변형) + nmake 연결, MSBuild 솔루션, CI 3종, 빌드 구성 4종([07](07-tech-stack.md) 5절), 로그 뼈대([10](10-logging-evidence-operations.md)), 테스트 프레임워크, 코퍼스 v0, 11절 도구 | 3.2의 G0 게이트 항목 전부 |
 | **G1 시제품** | [07](07-tech-stack.md) 9절의 SP-1~SP-6 (`spikes/`에서) | 각 시제품의 결론을 ADR로 기록(필수 증거는 [10](10-logging-evidence-operations.md) 3.2), 측정 기준이 있는 시제품의 하네스를 `tests/perf/`로 승격, `spikes/` 삭제 |
 | **G2 로직 P1** | `jzip-shared`·`jzip-win`·`jzip-core` + CLI로 P1 로직(3.3 표의 G2 행). 진입 조건은 표 아래 | 해당 기능의 `[로직]` 수용 기준을 CLI·단위·코퍼스 테스트로 증명. `[화면]` 수용 기준은 G3에서 증명 |
 | **G3 기본 화면** | `JZip.exe` S1·S2·S3·S4·S5·S9, `jzip-shell` S7, MSIX 패키지와 셸 등록(#19의 매니페스트 `comServer`·`windows.fileExplorerContextMenus` 선언, [F19](05-feature-specs/F19-win11-menu.md) 3절의 G3 FR), #32, 기존 기능 #10·#14·#18·#20·#35의 WinUI 재구현 | 설치 → 우클릭 → 풀기 → 알림까지 전체 흐름 증거(E5는 대화형 러너에서, [10](10-logging-evidence-operations.md) 3.1). G2 기능의 `[화면]` 수용 기준 증거 |
@@ -97,6 +103,8 @@ j-zip/
 | 8 | ADR: LocalDumps | WER LocalDumps가 MSIX 패키지 앱(`JZip.exe`)에서 덤프를 남기는지 실측한 결과 |
 | 9 | ADR: C++/WinRT 버전 | Windows App SDK 2.5 템플릿이 실제로 참조하는 C++/WinRT 버전을 확인하고, [07](07-tech-stack.md)에 고정한 3.0.x와의 관계를 기록 |
 | 10 | 도구 | 11절 도구가 계약대로 동작(각 도구의 종료 코드 0/1/2 확인) |
+| 11 | 핸드오프 스모크 | [12](12-agent-orchestration.md) 9절의 확인 항목 U1~U14가 `G0-INFRA-T16`의 `SMOKE.md`에 결과와 함께 기록되고, 모델별 필수 항목을 통과하거나 ADR(`핸드오프 경로 확정`)이 사용 범위를 정함 |
+| 12 | 레포 골격 | 2절 구조의 폴더(빈 폴더는 `.gitkeep`)가 있고, `upstream/7zip`이 26.04 태그와 트리 해시까지 같고, `upstream/PATCHES.md`·`third_party/VERSIONS.md`·`THIRD_PARTY_NOTICES.md`가 있음(`G0-INFRA-T01`의 검사 스크립트) |
 
 ### 3.3 기능·화면 ↔ 단계
 
@@ -169,28 +177,12 @@ G2는 `jzip-shared`·`jzip-core` 로직과 CLI, G3는 기본 화면, G4는 P2, G
 - 시제품은 `SP1`~`SP6`(본문에서는 "SP-1"처럼 써도 된다). 예) `G1-SP2-T01`
 - 기능과 무관한 작업은 `G0-INFRA-T01`, 운영 기능은 `G4-OPS-T01`, 단계 정리는 `G3-CLEANUP-T01`, 업스트림 갱신은 `G5-UPSTREAM-T01`
 
-```markdown
-# G2-F17-T03 인코딩 후보 점수 계산
+카드 양식(15개 섹션 0–14)은 [work/tasks/README.md](../work/tasks/README.md)가 정한다. 이 문서는 작업 ID 규칙과 분류별 수용 기준만 정한다. 기준이 되는 카드(gold standard):
 
-| 항목 | 내용 |
-|---|---|
-| 단계 | G2 |
-| 근거 | F17 FR-17-5 ~ FR-17-10 |
-| 수용 기준 | F17 8절 1a·2a·3a [로직] |
-| 변경 범위 | src/shared/encoding/** , tests/unit/encoding/** |
-| 허용 원본 파일 | upstream/7zip/CPP/7zip/Archive/Zip/ZipItem.cpp (JZIP-PATCH 훅만) |
-| 금지 범위 | 위에 없는 upstream/** (필요하면 작업 중단 후 보고), src/app/** |
-| 선행 작업 | G2-F17-T02 |
-| 필요한 증거 | E1, E2, E3, E9 |
-| 작성 | implementer 에이전트 |
-| 검토 | reviewer 에이전트 → verifier 에이전트 |
+- [work/tasks/G2-F17-T03.md](../work/tasks/G2-F17-T03.md) — 로직 카드(인터페이스 계약, 수식, 손계산한 테스트 기대값)
+- [work/tasks/G0-INFRA-T01.md](../work/tasks/G0-INFRA-T01.md) — 인프라 카드(명령 순서, 검사 스크립트, 핸드오프 전 단계)
 
-## 할 일
-## 완료 조건
-## 메모 (작업 중 발견한 사실, 미결 사항)
-```
-
-`근거`·`수용 기준` 행: 기능 카드는 명세의 FR과 8절 항목(태그 포함)을 적는다. FR이 없는 카드는 아래를 수용 기준으로 적는다(8절).
+카드 4절(근거)에는 명세의 FR과 8절 항목(태그 포함)을 적는다. FR이 없는 카드는 아래를 수용 기준으로 적는다(8절).
 
 | 카드 분류 | `수용 기준` 행에 적는 것 |
 |---|---|
@@ -210,12 +202,13 @@ G2는 `jzip-shared`·`jzip-core` 로직과 CLI, G3는 기본 화면, G4는 P2, G
 | reviewer | 변경 검토(명세 일치, 결함, 단순화, 금지 패턴). 결과는 PR 코멘트(E9) | 코드 수정 (지적만) |
 | verifier | 깨끗한 환경에서 빌드·테스트·게이트를 다시 실행해 증거가 재현되는지 확인. 결과를 정해진 형식의 PR 코멘트(E9, [10](10-logging-evidence-operations.md) 3.3)로 남김. 단계 정리 카드(`G<n>-CLEANUP-T01`)에서는 `check-stage`를 다시 실행 | 증거 없이 승인 |
 | gatekeeper | 단계 시작 때 초안 릴리스 `gate-G<n>` 생성(CI 작업), 단계 종료 정리 카드 생성과 정리 실행, 게이트 통과 때 릴리스 게시 | 기능 추가, 자기 정리 결과 승인 |
-| CI 봇 | 병합 뒤 verifier 결과를 매니페스트에 "검증"·"보관본" 행으로 덧붙이는 커밋(`work/evidence/**`만). "보관본" 행에 `main`의 squash 병합 커밋 SHA를 적는다 | 그 밖의 모든 변경 |
+| CI 봇 | 병합 뒤 verifier 결과를 매니페스트에 "검증"·"보관본" 행으로 덧붙이는 커밋(`work/evidence/**`만). "보관본" 행에 `main`의 병합 SHA(squash 병합이면 squash 커밋, 병합 커밋 방식이면 그 병합 커밋)를 적는다 | 그 밖의 모든 변경 |
 
 규칙:
 
 - implementer와 reviewer·verifier는 **서로 다른 세션**에서 실행한다.
-- 에이전트가 막히면(명세 모순, 허용되지 않은 원본 패치 필요, 외부 결정 필요) 추측하지 말고 작업 카드 "메모"에 기록하고 멈춘다. 사람이 결정하면 ADR을 남긴다.
+- 오케스트레이터([12](12-agent-orchestration.md) 2절)는 planner와 gatekeeper 역할을 맡고, 외부 모델 배정·핸드오프·원본 가져오기(2절)는 12절을 따른다. implementer와 reviewer는 외부 모델이며 네트워크를 쓰지 않는다.
+- 에이전트가 막히면(명세 모순, 허용되지 않은 원본 패치 필요, 외부 결정 필요) 추측하지 말고 `work/handoff/<작업 ID>/RESULT.md`에 `BLOCKED`로 기록하고 멈춘다([work/tasks/README.md](../work/tasks/README.md) 4.3). 사람이 결정하면 ADR을 남긴다.
 
 ---
 
@@ -245,10 +238,11 @@ G2는 `jzip-shared`·`jzip-core` 로직과 CLI, G3는 기본 화면, G4는 P2, G
 | 항목 | 규칙 |
 |---|---|
 | 브랜치 | `<종류>/<작업 ID>-<짧은 이름>` 예) `feat/G2-F17-T03-encoding-score` |
-| 커밋 | Conventional Commits + 작업 ID. 예) `feat(shared): score encoding candidates [G2-F17-T03]`. 증거 매니페스트는 코드 커밋과 섞지 않고 `work/evidence/**`만 바꾸는 커밋으로 따로 둔다 |
-| PR | 작업 하나당 하나. 템플릿: 근거(FR/AC), 변경 요약, **증거**, 남긴 임시 코드(있으면 이유), 미결 사항 |
-| CI 경로 필터 | `work/evidence/**`만 바꾼 커밋은 다시 빌드하지 않는다. 워크플로 단위 `paths-ignore`는 쓰지 않는다(필수 검사가 대기 상태로 남아 병합이 막힘). 대신 첫 작업(경로 필터 작업)이 바뀐 경로를 보고, 증거 전용이면 빌드·테스트 작업을 **작업(job) 단위로** 건너뛰며 필수 검사는 성공으로 보고한다. CI는 매니페스트에 적힌 코드 커밋 SHA가 "PR 머리에서 매니페스트 전용 커밋을 뺀 마지막 커밋"과 같은지 검사한다 |
-| 병합 | squash 병합. 병합 뒤에도 매니페스트의 코드 커밋 SHA는 `refs/pull/<번호>/head`로 도달할 수 있고, CI 봇이 "보관본" 행에 `main`의 squash 병합 커밋 SHA를 함께 적는다([10](10-logging-evidence-operations.md) 3.3). `main`에 직접 push와 강제 push 금지. 예외는 CI 봇의 증거 보관본 커밋 하나뿐이며 `work/evidence/**`만 바꿀 수 있다 |
+| 커밋 | Conventional Commits + 작업 ID. 예) `feat(shared): compute encoding candidate scores [G2-F17-T03]`. 증거 매니페스트는 코드 커밋과 섞지 않고 `work/evidence/**`만 바꾸는 커밋으로 따로 둔다. 외부 실행 기록(`work/handoff/**`)도 코드 커밋과 섞지 않는다 |
+| 기록 전용 커밋 | `work/handoff/**` 또는 `work/evidence/**`**만** 바꾸는 커밋. 이 두 경로 밖의 파일이 하나라도 있으면 기록 전용이 아니다([12](12-agent-orchestration.md) 4.5, [10](10-logging-evidence-operations.md) 3.3) |
+| PR | 작업 하나당 하나. 템플릿: 근거(FR/AC), 변경 요약, **증거**, 남긴 임시 코드(있으면 이유), 미결 사항. 외부 모델이 한 작업이면 "외부 실행" 항목([12](12-agent-orchestration.md) 4.9) |
+| CI 경로 필터 | 기록 전용 커밋은 다시 빌드하지 않는다. 워크플로 단위 `paths-ignore`는 쓰지 않는다(필수 검사가 대기 상태로 남아 병합이 막힘). 대신 첫 작업(경로 필터 작업)이 바뀐 경로를 보고, 기록 전용이면 빌드·테스트 작업을 **작업(job) 단위로** 건너뛰며 필수 검사는 성공으로 보고한다. CI는 매니페스트에 적힌 코드 커밋 SHA가 "PR 머리에서 기록 전용 커밋을 뺀 마지막 커밋"과 같은지 검사한다 |
+| 병합 | 기본은 squash 병합. 병합 뒤에도 매니페스트의 코드 커밋 SHA는 `refs/pull/<번호>/head`로 도달할 수 있고, CI 봇이 "보관본" 행에 `main`의 병합 SHA를 함께 적는다([10](10-logging-evidence-operations.md) 3.3). **git subtree를 추가·갱신하는 PR(`G0-INFRA-T01`과 모든 `*-UPSTREAM-*` 작업)은 squash하지 않고 병합 커밋(merge commit)으로 병합한다.** `git-subtree-dir`·`git-subtree-split` trailer가 담긴 커밋이 `main` 이력에 남아야 다음 `git subtree pull`이 이전 가져오기를 찾는다. `main`에 직접 push와 강제 push 금지. 예외는 CI 봇의 증거 보관본 커밋 하나뿐이며 `work/evidence/**`만 바꿀 수 있다 |
 | 금지 | 테스트 비활성화(`DISABLED_`, `GTEST_SKIP` 남용), 매니페스트가 참조하는 증거의 수정·삭제, 서명 인증서·비밀 커밋, 작업 범위 밖 수정 |
 | 허용 | 어떤 매니페스트도 참조하지 않는 로컬 진단 파일(임시 `.etl`, 덤프, 캡처 원본)은 지워도 된다. 매니페스트가 참조하는 항목은 업로드(CI 아티팩트·릴리스 자산)가 끝난 뒤에만 로컬에서 지운다 |
 
@@ -261,7 +255,7 @@ G2는 `jzip-shared`·`jzip-core` 로직과 CLI, G3는 기본 화면, G4는 P2, G
 - [ ] 작업 카드의 근거 FR과 수용 기준(태그에 맞는 범위)을 모두 충족. FR이 없는 카드는 분류별 기준을 충족: `G0-INFRA` = 3.2 게이트 항목(번호), `CLEANUP` = [10](10-logging-evidence-operations.md) 5절 표의 행, `UPSTREAM` = 10절 단계, `OPS` = OPS 명세의 FR·수용 기준(4절 표)
 - [ ] 새 로직에 단위 테스트, 관련 코퍼스 통합 테스트 통과
 - [ ] CI 3종(VS 2026 x64, VS 2022 x64, ARM64) 통과. ARM64 러너를 쓸 수 없으면 x64 러너의 ARM64 교차 컴파일 성공으로 대신하고 PR에 그 사실을 적는다([07](07-tech-stack.md) 8절)
-- [ ] 증거 매니페스트(`work/evidence/<작업 ID>/EVIDENCE.md`)를 스크립트로 생성, 코드 커밋 SHA가 CI 검사와 일치, 필요한 증거 종류 모두 포함. verifier의 `JZIP-VERIFY` 코멘트 뒤에는 행 추가만([10](10-logging-evidence-operations.md) 3.3)
+- [ ] 증거 매니페스트(`work/evidence/<작업 ID>/EVIDENCE.md`)를 스크립트로 생성, 코드 커밋 SHA가 CI 검사와 일치, 필요한 증거 종류 모두 포함. verifier의 `JZIP-VERIFY` 코멘트 뒤에는 행 추가만([10](10-logging-evidence-operations.md) 3.3). 예외: `new-manifest.ps1`(`G0-INFRA-T07`)이 병합되기 전의 작업은 매니페스트를 손으로 쓸 수 있고 **첫 줄에 `수동 작성(증거 도구 이전)`** 을 적는다. 이 매니페스트는 T07이 병합된 뒤에도 다시 생성하지 않고 그대로 둔다. T07이 백필 안내 행을 한 번 덧붙인다(10 3.3)
 - [ ] 게이트 사전 검사 통과(임시 코드 표시 규칙 준수, [10](10-logging-evidence-operations.md) 4절)
 - [ ] reviewer 승인, verifier 재현 확인(PR 코멘트 E9)
 - [ ] 명세와 다르게 만든 부분이 있으면 명세 수정 PR 또는 ADR
@@ -286,10 +280,11 @@ G2는 `jzip-shared`·`jzip-core` 로직과 CLI, G3는 기본 화면, G4는 P2, G
 
 ## 10. 7-Zip 업스트림 갱신
 
-1. 별도 작업(`G<n>-UPSTREAM-T<번호>`)으로 `git subtree pull --prefix upstream/7zip` — 다른 작업과 섞지 않는다
+1. 별도 작업(`G<n>-UPSTREAM-T<번호>`)으로 `git subtree pull --prefix=upstream/7zip https://github.com/ip7z/7zip.git <태그> --squash` — 다른 작업과 섞지 않는다. 가져오기 커밋은 `--squash`로 만들고(7-Zip 전체 이력을 들이지 않는다), 이 단계는 오케스트레이터만 하는 **원본 가져오기**다(2절, [12](12-agent-orchestration.md) 4.10). 태그와 커밋 SHA는 작업 카드에 고정돼 있어야 한다
 2. `upstream/PATCHES.md`의 패치를 하나씩 확인하고 충돌 해결
 3. 코퍼스 통합 테스트 전체 실행, 결과를 이전 버전과 비교한 표를 증거로 남김
 4. [research/7zip-26.04-source-facts.md](research/7zip-26.04-source-facts.md)처럼 새 버전 기준 근거 자료를 갱신
+5. 이 PR은 squash하지 않고 병합 커밋으로 병합한다(7절). trailer가 `main` 이력에 남는다
 
 ---
 
@@ -301,10 +296,10 @@ G2는 `jzip-shared`·`jzip-core` 로직과 CLI, G3는 기본 화면, G4는 P2, G
 |---|---|---|---|
 | `tools/build.ps1` | `-Config Debug\|Dev\|Test\|Release`, `-Arch x64\|arm64`, `[-Target all\|shared\|win\|core\|engine\|app\|shell\|package]` | `out/<Config>/<Arch>/` 바이너리, MSBuild `/bl` 로그, nmake 출력 로그(E1). `shared`·`win`은 `-mt`·`-md` 두 변형을 만든다. nmake는 구성에 맞는 정의(`JZIP_DEV_TRACE=1` 등)와 `JZIP_SHARED_LIB`·`JZIP_WIN_LIB`(`-mt` 변형)로 호출 | G0-INFRA-T02 |
 | `tests/unit/run.ps1` | `-Config`, `-Arch`, `[-Filter <GoogleTest 필터>]` | `out/test/unit-<이름>.xml`(JUnit XML, E2) | G0-INFRA-T04 |
-| `tests/integration/run.ps1` | `-Config Release\|Test`, `-Arch`, `[-Suite <이름>]`, `[-Corpus <경로>]` | `out/test/corpus-<이름>.csv`·`.md`(아카이브별 기대값·실제값·결과, E3). E3 증거로 쓰려면 `Release`, 테스트 훅에 의존하는 묶음은 `Test` | G0-INFRA-T05 |
+| `tests/integration/run.ps1` | `-Config Release\|Test`, `-Arch`, `[-Suite <이름>]`, `[-Corpus <경로>]` | `out/test/corpus-<이름>.csv`·`.md`(케이스별 기대값·실제값·결과, E3). E3 증거로 쓰려면 `Release`, 테스트 훅에 의존하는 묶음은 `Test`. `-Suite <이름>`은 두 종류를 고른다: **7z.exe 코퍼스 묶음**(원본 `7z.exe`로 아카이브를 처리해 정답 파일과 비교)과 **로직 이름 묶음**(통합 테스트 실행 파일이 `tests/corpus/<이름>/`의 입력과 `expected.csv`로 `jzip-shared` 로직을 돌림. 예: `encoding-score`). 두 종류 모두 같은 형식의 결과 표를 만든다 | G0-INFRA-T05 |
 | `tests/corpus/generate.ps1` | `[-Set v0\|full]`, `-Out <경로>` | 생성한 아카이브 + `manifest.csv`(파일, SHA-256, 정답 파일) | G0-INFRA-T05 |
 | `tests/perf/run.ps1` | `-Config Release`, `-Arch`, `-Scenario <이름>` | `out/perf/<이름>.json`(수치 + CPU·OS 빌드·아키텍처, E8) | G0-INFRA-T09 (뼈대), 하네스는 G1 시제품에서 승격 |
-| `tools/evidence/new-manifest.ps1` | `-Task <작업 ID>`, `[-RunLog <경로>]`, `[-CiRun <URL>]` | `work/evidence/<작업 ID>/EVIDENCE.md`(코드 커밋 SHA, 환경, 실행 명령, 산출물 해시) | G0-INFRA-T07 |
+| `tools/evidence/new-manifest.ps1` | `-Task <작업 ID>`, `[-RunLog <경로>]`, `[-CiRun <URL>]` | `work/evidence/<작업 ID>/EVIDENCE.md`(코드 커밋 SHA, 환경, 실행 명령, 산출물 해시, `work/handoff/<작업 ID>/RUNLOG.md`가 있으면 "외부 실행 기록" 절) | G0-INFRA-T07 |
 | `tools/evidence/trace-start.ps1` | `-Session <이름>`, `[-Keywords Ops\|Dev\|All]`, `[-Out <폴더>]` | `JZip` 공급자 ETW 세션 시작 | G0-INFRA-T06 |
 | `tools/evidence/trace-stop.ps1` | `-Session <이름>` | `.etl` + `tracefmt` 변환 텍스트(E4) | G0-INFRA-T06 |
 | `tools/evidence/capture-window.ps1` | `-Process JZip\|explorer`, `-Element <요소 ID>`, `-Theme light\|dark`, `-Scale 100\|150\|200`, `-Task <작업 ID>` | 축소 PNG(200KB 이하) `work/evidence/<작업 ID>/screens/<요소>-<테마>-<배율>.png`(E5). 대화형 세션이 아니면 1로 종료 | G0-INFRA-T08 |

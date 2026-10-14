@@ -38,10 +38,11 @@ flowchart LR
 
 ### 1.1 핵심 경로
 
-전체 일정을 결정하는 가장 긴 선행 사슬이다(선행 관계로 이어지는 작업 14개, 각 단계 정리 작업 포함). 이 경로의 작업이 늦어지면 출시가 늦어진다.
+전체 일정을 결정하는 가장 긴 선행 사슬이다(선행 관계로 이어지는 작업 15개, 각 단계 정리 작업 포함). 이 경로의 작업이 늦어지면 출시가 늦어진다.
 
 ```
-G0-INFRA-T01 레포 골격
+G0-INFRA-T16 핸드오프 스모크 테스트
+ → G0-INFRA-T01 레포 골격
  → G0-INFRA-T02 빌드 스크립트·솔루션
  → G0-INFRA-T11 jzip-shared·jzip-win 연결
  → G0-INFRA-T14 WinUI 3 빈 앱 + MSIX 뼈대
@@ -58,17 +59,18 @@ G0-INFRA-T01 레포 골격
 
 ## 2. G0 골격
 
-게이트: [09](09-development-process.md) 3.2의 항목 1–10. 도구 작업 번호(T02, T04–T10)는 09 11절 도구 계약 표와 같다.
+게이트: [09](09-development-process.md) 3.2의 항목 1–12. 도구 작업 번호(T02, T04–T10)는 09 11절 도구 계약 표와 같다.
 
 | ID | 작업 | 근거 | 선행 | 크기 | 증거 |
 |---|---|---|---|---|---|
-| G0-INFRA-T01 | 레포 골격: 폴더 구조, 7-Zip 26.04 subtree(`upstream/7zip`), `upstream/PATCHES.md`, `third_party/VERSIONS.md`, `THIRD_PARTY_NOTICES.md` 초안 | 09 2절 | — | S | E1 |
+| G0-INFRA-T16 | 핸드오프 경로 스모크 테스트: 버리는 worktree에서 Codex(`gpt-6-luna`)·Antigravity(`gemini-3.8-flash-medium`)를 각각 한 번 실행해 모델 고정, Windows에서의 쓰기 범위 제한, 출력 수집, 시간 초과 처리를 확인. **통과 전에는 다른 외부 핸드오프 금지** | [12](12-agent-orchestration.md) 9절, 09 3.2 #11 | — | M | E4 + RUNLOG + ADR |
+| G0-INFRA-T01 | 레포 골격: 폴더 구조(`spikes/`·`tests/scratch/`는 `.gitkeep`), 7-Zip 26.04 subtree(`upstream/7zip`, **오케스트레이터가 핸드오프 전에 가져옴**, 12 4.10), `upstream/PATCHES.md`, `third_party/VERSIONS.md`, `THIRD_PARTY_NOTICES.md` 초안. PR은 병합 커밋으로 병합(09 7절) | 09 2절, 09 3.2 #12 | T16 | S | E1 |
 | G0-INFRA-T02 | `tools/build.ps1` + `jzip.sln` + 빌드 구성 4종(Debug·Dev·Test·Release), nmake 호출 래핑, `out/runlog.jsonl` 기록 | 09 3.2 #1·#4, 09 11절, 07 5절 | T01 | M | E1 |
-| G0-INFRA-T03 | CI 워크플로: `windows-2025`(VS 2026)·`windows-2022`·`windows-11-arm`, ARM 불가 시 교차 컴파일, 작업 단위 경로 필터(성공 보고), 아티팩트 `retention-days: 90` | 09 7절, 07 8절 | T02 | M | E1 |
+| G0-INFRA-T03 | CI 워크플로: `windows-2025`(VS 2026)·`windows-2022`·`windows-11-arm`, ARM 불가 시 교차 컴파일, 작업 단위 경로 필터(기록 전용 커밋 — `work/handoff/**`·`work/evidence/**`만 바뀐 커밋 — 은 빌드·테스트 건너뛰고 성공 보고), 아티팩트 `retention-days: 90` | 09 7절, 07 8절 | T02 | M | E1 |
 | G0-INFRA-T04 | GoogleTest(vcpkg 기준선 고정) + `tests/unit/run.ps1` | 09 11절 | T02 | S | E1, E2 |
-| G0-INFRA-T05 | 코퍼스 v0 생성기 `tests/corpus/generate.ps1` + 통합 테스트 실행기 `tests/integration/run.ps1`, 원본 `7z.exe` 기준선 통과 | 09 3.2 #1·#6 | T02 | M | E1, E3 |
+| G0-INFRA-T05 | 코퍼스 v0 생성기 `tests/corpus/generate.ps1` + 통합 테스트 실행기 `tests/integration/run.ps1`, 원본 `7z.exe` 기준선 통과. 실행기는 로직 묶음도 돌린다: `-Suite <이름>`이 7z.exe 코퍼스 묶음 또는 통합 테스트 실행 파일의 로직 이름 묶음(`tests/corpus/<이름>/`) 중 하나를 고른다(09 11절) | 09 3.2 #1·#6, 09 11절 | T02 | M | E1, E3 |
 | G0-INFRA-T06 | 로그 뼈대: `ILogger` 포트, `JZ_LOG_*`·`JZ_DEV_TRACE`(`JZDEV\|` 표식) 매크로, 바이너리별 ETW 공급자(GUID 고정), `EVENTS.md`, `trace-start/stop.ps1` | 09 3.2 #7, 10 2절 | T11 | M | E1, E4 |
-| G0-INFRA-T07 | 증거 도구: `new-manifest.ps1`, CI의 `JZIP-VERIFY` 댓글 반영 봇, PR별 `evidence-pr-<번호>.zip`을 초안 릴리스 `gate-G<n>`에 첨부 | 10 3.3, 09 11절 | T03 | M | E1 |
+| G0-INFRA-T07 | 증거 도구: `new-manifest.ps1`(`RUNLOG.md`가 있으면 "외부 실행 기록" 절 생성), CI의 `JZIP-VERIFY` 댓글 반영 봇, PR별 `evidence-pr-<번호>.zip`을 초안 릴리스 `gate-G<n>`에 첨부. 병합 때 `수동 작성(증거 도구 이전)` 매니페스트(T01~T06 등)에 "백필 안내" 행을 한 번 덧붙임(10 3.3) | 10 3.3, 09 11절 | T03 | M | E1 |
 | G0-INFRA-T08 | `capture-window.ps1`(대화형 세션 검사, 축소 PNG 200KB 이하) + 대화형 러너 준비 문서 | 10 3.1 E5 | T01 | S | E5 |
 | G0-INFRA-T09 | 성능 테스트 뼈대 `tests/perf/run.ps1` | 09 11절 | T04 | S | E8 |
 | G0-INFRA-T10 | 게이트 스크립트 `check-task.ps1`·`check-stage.ps1`(임시 표시, 구성 정의, 바이너리 `JZDEV\|` 검사, PATCHES 대조, 이벤트 목록 대조) | 09 3.2 #10, 10 4·5절 | T06, T07 | M | E1 |
@@ -121,10 +123,12 @@ G0-INFRA-T01 레포 골격
 |---|---|---|---|---|---|
 | G2-F17-T01 | 코드페이지 변환기(`jzip-win/locale`, `MB_ERR_INVALID_CHARS`, OEM/ACP 조회) | F17 7절 | G0-INFRA-T11 | S | E1, E2 |
 | G2-F17-T02 | 후보별 바이트 유효성 검사(1단계) | F17 FR-17-4·5 | G2-F17-T01 | M | E1, E2 |
-| G2-F17-T03 | 인코딩 후보 점수 계산(UTF-8 우선, 그럴듯함, CP949/GBK 겹침, 동점·확신 부족) — [09](09-development-process.md) 4절 예시 카드 | F17 FR-17-6~12 | G2-F17-T02 | M | E1, E2, E3 |
-| G2-F17-T04 | `ZipItem`·`ZipHandler` 연결 패치: 이름 결정 순서(FR-17-13), Unix 규칙 처리, 항목별 UTF-8 예외, `cp` 속성 | F17 FR-17-13~16 | G2-F17-T03 | M | E1, E2, E3 |
+| G2-F17-T03 | 인코딩 후보 점수 공식: V·P·P′·F·prior·score(UTF-8 P′ 1.0, 그럴듯함, CP949/GBK 겹침 보정). 상용 문자 빈도표는 주입 인터페이스로만 받음 | F17 FR-17-7~9 | G2-F17-T02 | M | E1, E2 |
+| G2-F17-T04 | `ZipItem`·`ZipHandler` 연결 패치: 감지 입력 선택(FR-17-3 처리량 상한 이름 2,000개·256KiB 포함), 이름 결정 순서(FR-17-13), Unix 규칙 처리, 항목별 UTF-8 예외, `cp` 속성 | F17 FR-17-3, FR-17-13~16 | G2-F17-T08 | M | E1, E2, E3 |
 | G2-F17-T05 | ZIP 주석도 같은 코드페이지 적용(`CP_ACP` 고정 버그) | F17 FR-17-16, F16 | G2-F17-T04 | S | E2, E3 |
 | G2-F17-T06 | 한·중·일 코퍼스 확장과 기준값 조정, 결과 표 | F17 8절 [로직] | G2-F17-T04, G0-INFRA-T05 | M | E3 |
+| G2-F17-T08 | 순위·동점·확신·표시 퍼센트(UTF-8 확정 포함)와 이름 집합 코퍼스: `ScoreCandidates`, 통합 묶음 `-Suite encoding-score` | F17 FR-17-6·10~12, 8절 [로직] 감지 부분 | G2-F17-T03, G2-F17-T09, G0-INFRA-T05 | M | E1, E2, E3 |
+| G2-F17-T09 | 상용 문자 빈도표 ADR과 표 생성: 한글 상위 512자·간체 한자 상위 512자의 출처·라이선스 결정(ADR), 생성 스크립트, `jzip-shared`의 생성된 표 파일. 허용 라이선스 원본이 없으면 보류(사용자 결정) | F17 FR-17-8 | G0-INFRA-T11 | M | E1, E2 + ADR |
 | G2-F12-T01 | tar 한 번에 풀기 판정 규칙(`jzip-shared`) | F12 | G0-INFRA-T11 | S | E2 |
 | G2-F12-T02 | Gz·Bz2·Xz·Zstd 핸들러 `kpidMainSubfile` 패치 + 옵션 연결 | F12 7절 | G2-F12-T01 | M | E1, E2, E3 |
 | G2-F12-T03 | CLI 동작과 코퍼스(`.tgz`·`.tar.xz`·`.tzst` 등) | F12 8절 [로직] | G2-F12-T02 | S | E3 |
@@ -138,7 +142,7 @@ G0-INFRA-T01 레포 골격
 | G2-F31-T03 | `Extract()` 연결 패치 + CLI 스위치 + 코퍼스 | F31 FR-31-10, 8절 [로직] | G2-F31-T01, G2-F31-T02, G2-INFRA-T04, G2-INFRA-T01 | M | E3, E6 |
 | G2-CLEANUP-T01 | G2 정리 + `check-stage -Stage G2` | 10 5절 | G2의 다른 모든 작업 | S | E1 |
 
-병렬 묶음: F17 사슬, F12 사슬, F13 사슬, F31 사슬은 서로 독립이라 동시에 진행할 수 있다(모두 `G0-INFRA-T11`만 공통 선행).
+병렬 묶음: F17 사슬, F12 사슬, F13 사슬, F31 사슬은 서로 독립이라 동시에 진행할 수 있다(모두 `G0-INFRA-T11`만 공통 선행). F17 사슬 안에서는 `G2-F17-T09`(빈도표)가 `G0-INFRA-T11` 이후 바로 시작할 수 있어 `T01`~`T03`과 병렬이고, `G2-F17-T08`이 `T03`·`T09`를 합친다. 핵심 경로(1.1)에는 영향이 없다.
 
 ---
 
@@ -278,7 +282,7 @@ G0-INFRA-T01 레포 골격
 | #14 풀지 않고 수정 | G3-F14-T01 |
 | #15 바로 편집 | G4-F15-T01 |
 | #16 주석 | G2-F17-T05, G5-F16-T01 |
-| #17 인코딩 감지 | G2-F17-T01~T06, G3-F17-T07 |
+| #17 인코딩 감지 | G2-F17-T01~T06, G2-F17-T08·T09, G3-F17-T07 |
 | #18 우클릭 메뉴 | G3-F18-T01·T02 |
 | #19 Win11 메뉴 | G1-SP1-T01, G3-F19-T01, G4-F19-T02 |
 | #20 무결성 테스트 | G3-F20-T01 |
@@ -304,13 +308,13 @@ G0-INFRA-T01 레포 골격
 
 | 단계 | 작업 수 | 그중 L |
 |---|---|---|
-| G0 | 16 | 0 |
+| G0 | 17 | 0 |
 | G1 | 8 | 0 |
-| G2 | 22 | 2 |
+| G2 | 24 | 2 |
 | G3 | 26 | 2 |
 | G4 | 21 | 0 |
 | G5 | 12 | 2 |
 | G6 | 5 | 0 |
-| **합계** | **110** | **6** |
+| **합계** | **113** | **6** |
 
 L 작업 6개(`G2-INFRA-T03`, `G2-INFRA-T04`, `G3-INFRA-T02`, `G3-F10-T01`, `G5-F21-T01`, `G5-F36-T01`)는 카드를 만들 때 나눈다. 그래서 실제 PR 수는 120개 안팎이 될 것으로 본다.

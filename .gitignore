@@ -1,1 +1,3 @@
 .omc/
+work/handoff/**/*.jsonl
+work/handoff/**/*-stderr.log

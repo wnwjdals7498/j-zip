@@ -105,7 +105,7 @@ JZip.exe ─▶ 파일 로그 (LocalState\logs\)
 | E6 | 시스템 변화 | 실행 전후 파일·레지스트리 비교, REA 프로세스 동작 캡처([01](01-rea-overview.md)) | CI 아티팩트 |
 | E7 | 패키지 검증 | MSIX 빌드 로그, `signtool verify /pa`, 설치 로그, `Get-AppxPackage`·매니페스트 확인, Store 제출 전 Windows App Certification Kit 보고서 | CI 아티팩트 |
 | E8 | 성능 측정 | `tests/perf/run.ps1` 출력(환경: CPU·OS 빌드·아키텍처 포함) | CI 아티팩트 + 매니페스트에 수치 |
-| E9 | 검토 기록 | reviewer·verifier 보고(PR 코멘트, verifier는 3.3의 고정 형식) | PR + 병합 뒤 매니페스트 "보관본" 행 |
+| E9 | 검토 기록 | reviewer·verifier 보고(PR 코멘트, verifier는 3.3의 고정 형식)와 외부 검토 모델의 `work/handoff/<작업 ID>/REVIEW-<n>.md`([12](12-agent-orchestration.md) 4.7) | PR + 병합 뒤 매니페스트 "보관본" 행. `REVIEW-<n>.md`는 레포(기록 전용 커밋) |
 | E10 | 크래시 덤프 | **G0 검증 후 확정**(2.4) | 로컬 (매니페스트가 참조하면 업로드) |
 
 ### 3.2 작업 종류별 필수 증거
@@ -120,16 +120,20 @@ JZip.exe ─▶ 파일 로그 (LocalState\logs\)
 | 시제품 (SP-*) | E4 또는 E8 + ADR. 기술 검증이 아닌 시제품(SP-6 등)은 조사 노트 + ADR. **SP-1, SP-5는 E7도 필수** | E5 |
 | 모든 작업 | E9 | — |
 
+아직 빌드할 코드가 없는 작업(예: `G0-INFRA-T01`)의 E1은 그 작업의 **검사 스크립트 실행 로그**(변경 전 실패, 변경 후 통과)로 대신할 수 있다. 어떤 로그가 E1을 대신하는지와 명령은 카드의 10절에 적는다.
+
 ### 3.3 증거 매니페스트
 
-작업마다 `work/evidence/<작업 ID>/EVIDENCE.md`를 implementer가 **스크립트로 생성**한다(`tools/evidence/new-manifest.ps1`, [09](09-development-process.md) 11절). 손으로 결과를 적지 않는다.
+작업마다 `work/evidence/<작업 ID>/EVIDENCE.md`를 **스크립트로 생성**한다(`tools/evidence/new-manifest.ps1`, [09](09-development-process.md) 11절). 손으로 결과를 적지 않는다.
+
+**예외 — 수동 작성 매니페스트**: `new-manifest.ps1`(`G0-INFRA-T07`)이 병합되기 전의 작업(`G0-INFRA-T01`~`T06` 등)은 매니페스트를 손으로 쓸 수 있다. 이 경우 파일의 **첫 줄**에 `수동 작성(증거 도구 이전)`을 적는다. 이 매니페스트는 T07이 병합된 뒤에도 스크립트로 다시 생성하지 않고 그대로 둔다(그 작업들은 이미 `JZIP-VERIFY`를 받았으므로 아래 "추가만 가능" 규칙이 적용된다). 대신 T07의 병합 PR이 이 매니페스트마다 "백필 안내" 행을 한 번 덧붙인다(내용: 수동 작성임, 스크립트로 확인한 값이 없음, 정정은 새 행으로).
 
 ```markdown
-# 증거: G2-F17-T03
+# 증거: G2-F17-T08
 
 | 항목 | 값 |
 |---|---|
-| 코드 커밋 | <SHA> (매니페스트 전용 커밋 직전의 마지막 코드 커밋) |
+| 코드 커밋 | <SHA> (기록 전용 커밋 직전의 마지막 코드 커밋) |
 | 환경 | Windows 11 26200 x64, VS 2026 17.x, MSVC 14.5x |
 | CI 실행 | <URL> |
 
@@ -138,18 +142,24 @@ JZip.exe ─▶ 파일 로그 (LocalState\logs\)
 |---|---|---|---|---|
 | tools/build.ps1 -Config Release -Arch x64 | Release | (없음) | 0 | 4m12s |
 | tests/unit/run.ps1 -Config Release -Filter Encoding* | Release | (없음) | 0 | 9s |
-| tests/integration/run.ps1 -Config Release -Suite encoding | Release | (없음) | 0 | 41s |
+| tests/integration/run.ps1 -Config Release -Suite encoding-score | Release | (없음) | 0 | 41s |
 
 ## 산출물
 | 증거 | 파일 / 아티팩트 | SHA-256 |
 |---|---|---|
 | E2 | unit-encoding.xml | … |
-| E3 | corpus-encoding.md | … |
+| E3 | corpus-encoding-score.md | … |
 
 ## 수용 기준 대응
 | 수용 기준 | 증거 | 결과 |
 |---|---|---|
-| F17 8절-1a [로직] (한글 ZIP, UTF-8 플래그 없음 → CP949) | E3 corpus-encoding.md 3행 | 통과 |
+| F17 8절-1a [로직] 감지 부분 (한글 ZIP 이름 묶음, UTF-8 플래그 없음 → CP949) | E3 corpus-encoding-score.md `kr_ntfs-en` 행 | 통과 |
+
+## 외부 실행 기록
+| 역할 | 모델 | 실행 횟수 | 마지막 판정 | RUNLOG |
+|---|---|---|---|---|
+| 구현 | codex-gpt6-luna (gpt-6-luna) | 1 | 채택 | work/handoff/G2-F17-T08/RUNLOG.md |
+| 검토 | antigravity-gemini3.8flash-medium (gemini-3.8-flash-medium) | 1 | 채택 | 같은 파일 |
 
 ## 검증
 | 역할 | 결과 | 시각 | 출처 |
@@ -157,15 +167,16 @@ JZip.exe ─▶ 파일 로그 (LocalState\logs\)
 | verifier | 재현 성공 | … | PR #<번호> 코멘트 |
 
 ## 보관본
-| PR | main 커밋 (squash) | 릴리스 자산 | 추가 시각 |
+| PR | main 커밋 (squash 또는 병합 커밋) | 릴리스 자산 | 추가 시각 |
 |---|---|---|---|
 | #<번호> | <SHA> | gate-G<n> / evidence-pr-<번호>.zip | … |
 ```
 
 규칙:
 
-- **코드 커밋 SHA**: 매니페스트에는 매니페스트 전용 커밋 직전의 마지막 코드 커밋 SHA를 적는다. 매니페스트 전용 커밋(`work/evidence/**`만 바꿈)에서는 경로 필터 작업이 빌드·테스트 작업을 **작업(job) 단위로** 건너뛰고 성공으로 보고한다(워크플로 단위 `paths-ignore`는 필수 검사를 대기 상태로 남기므로 쓰지 않는다). CI는 매니페스트의 SHA가 "PR 머리에서 매니페스트 전용 커밋을 뺀 커밋"과 같은지 검사한다([09](09-development-process.md) 7절).
-- **squash 병합 뒤 추적**: squash 병합하면 매니페스트의 코드 커밋 SHA는 `main`에 남지 않지만 `refs/pull/<번호>/head`로 계속 도달할 수 있다. CI 봇은 "보관본" 행에 `main`의 squash 병합 커밋 SHA를 함께 적는다.
+- **코드 커밋 SHA**: 매니페스트에는 기록 전용 커밋 직전의 마지막 코드 커밋 SHA를 적는다. **기록 전용 커밋**은 `work/handoff/**` 또는 `work/evidence/**`만 바꾸는 커밋이다([09](09-development-process.md) 7절, [12](12-agent-orchestration.md) 4.5). 기록 전용 커밋에서는 경로 필터 작업이 빌드·테스트 작업을 **작업(job) 단위로** 건너뛰고 성공으로 보고한다(워크플로 단위 `paths-ignore`는 필수 검사를 대기 상태로 남기므로 쓰지 않는다). CI는 매니페스트의 SHA가 "PR 머리에서 기록 전용 커밋을 뺀 커밋"과 같은지 검사한다([09](09-development-process.md) 7절).
+- **외부 실행 기록 절**: `work/handoff/<작업 ID>/RUNLOG.md`가 있으면 `new-manifest.ps1`이 위 예시의 "외부 실행 기록" 절(역할별 모델, 실행 횟수, 마지막 판정, RUNLOG 링크)을 RUNLOG에서 생성한다. RUNLOG가 없으면 절을 쓰지 않는다. 이 기능은 `G0-INFRA-T07` 범위다.
+- **병합 뒤 추적**: squash 병합하면 매니페스트의 코드 커밋 SHA는 `main`에 남지 않지만 `refs/pull/<번호>/head`로 계속 도달할 수 있다. 병합 커밋 방식(subtree를 추가·갱신하는 PR, [09](09-development-process.md) 7절)은 코드 커밋이 `main` 이력에 그대로 남는다. CI 봇은 어느 방식이든 "보관본" 행에 `main`의 병합 SHA를 함께 적는다.
 - **명령 행**: 명령마다 빌드 구성과 정의(`JZIP_DEV_TRACE`, `JZIP_TEST_HOOKS`)를 적는다. 테스트 훅에 의존하는 묶음은 `Test` 구성으로, E3 코퍼스 증거는 `Release` 바이너리로 실행한다.
 - **verifier 결과**: verifier는 PR 코멘트에 아래 고정 형식으로 쓴다. 병합 뒤 CI 작업(봇)이 이 코멘트를 읽어 "검증" 행과 "보관본" 행을 매니페스트에 덧붙인다. 이 봇 커밋이 `main`에 허용된 유일한 자동 커밋이며 `work/evidence/**`만 바꾼다.
 
@@ -211,12 +222,14 @@ PR 검사(`tools/gate/check-task.ps1`):
 | 개발 로그 `JZ_DEV_TRACE` | 삭제. 계속 필요한 정보면 운영 로그로 **승격**(이벤트 목록 등록 후 `JZ_LOG_*`로 교체) | 해당 단계 작업 ID로 검색 0건 |
 | 임시 코드 `JZ-TEMP` | 삭제하거나 정식 코드로 바꾸고 표시 제거 | 검색 0건 |
 | 테스트 훅 | 사용하는 테스트가 없으면 삭제. 남는 훅은 포트로 바꿀 수 있는지 검토 | 미사용 훅 0건 |
-| `tests/scratch/` | 가치 있는 테스트는 `tests/unit`·`tests/integration`으로 옮기고(기대값을 명세 기준으로 다시 확인), 나머지 삭제 | 폴더 비어 있음 |
-| `spikes/` | 측정 하네스는 `tests/perf/`로 승격, ADR 작성 후 삭제. 기록용으로 git 태그 `spike/<SP 번호>-final` | 폴더 비어 있음, ADR 존재 |
+| `tests/scratch/` | 가치 있는 테스트는 `tests/unit`·`tests/integration`으로 옮기고(기대값을 명세 기준으로 다시 확인), 나머지 삭제 | 폴더 비어 있음(`.gitkeep` 외 파일 없음) |
+| `spikes/` | 측정 하네스는 `tests/perf/`로 승격, ADR 작성 후 삭제. 기록용으로 git 태그 `spike/<SP 번호>-final` | 폴더 비어 있음(`.gitkeep` 외 파일 없음), ADR 존재 |
 | 증거 산출물 | PR마다 이미 `evidence-pr-<번호>.zip`으로 초안 릴리스 `gate-G<n>`에 붙어 있음(3.3). 게이트 통과 때 이 릴리스를 게시 | 단계의 모든 매니페스트에 "보관본" 행이 있고 링크가 유효 |
 | 로컬 진단 파일 | 어떤 매니페스트도 참조하지 않는 `.etl`, 덤프, 캡처 원본은 삭제. 매니페스트가 참조하는 항목은 업로드가 끝난 뒤에만 삭제 | — |
 | 증거 수집 도구 `tools/evidence` | **유지** (배포물에 포함 안 됨) | — |
 | 영구 테스트(`unit`·`integration`·`perf`)·코퍼스·운영 로그·로그 기반 코드 | **유지** | — |
+
+"비어 있음"은 `.gitkeep`을 뺀 파일이 없다는 뜻이다. `spikes/`와 `tests/scratch/`의 `.gitkeep`은 `G0-INFRA-T01`이 만들며 정리에서도 지우지 않는다(폴더가 레포에서 사라지지 않게 한다).
 
 정리가 끝나면 `tools/gate/check-stage.ps1 -Stage G<n>`을 실행한다. 이 스크립트의 보고서가 단계 종료 증거다. **gatekeeper가 아닌 verifier**가 `check-stage`를 다시 실행해 그 결과를 `G<n>-CLEANUP-T01` 카드의 증거로 남긴다.
 
