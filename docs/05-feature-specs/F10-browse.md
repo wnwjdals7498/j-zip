@@ -60,8 +60,8 @@
 
 ## 7. 구현 지점
 
-- 데이터: `CPP/7zip/UI/Agent/Agent.cpp` `CAgent::Open`(1628행), `ArchiveFolder.cpp`, `AgentProxy.cpp` — 변경 없음.
-- 트리·브레드크럼·정보 창은 FM 패널 레이아웃(`FileManager/Panel.cpp`/`Panel.h`, `App.cpp` — research 자료 #26 변경 지점과 같은 위치)에 새로 추가한다. 트리 관련 기존 코드는 없다.
+- 데이터(`jzip-core`): `CPP/7zip/UI/Agent/Agent.cpp` `CAgent::Open`(1628행), `ArchiveFolder.cpp`, `AgentProxy.cpp` — 동작 변경 없음.
+- 화면: 트리·브레드크럼·목록·정보 창은 `JZip.exe`(WinUI 3) S1 화면에 새로 만든다. 7zFM 패널 레이아웃(`FileManager/Panel.cpp`/`Panel.h`, `App.cpp`)은 수정하지 않고 현재 동작 근거로만 쓴다. 트리 관련 기존 코드는 없다. 대용량 목록 가상화 성능은 시제품 SP-2에서 확인한다([07. 기술 스택](../07-tech-stack.md) 9절).
 
 ## 8. 수용 기준
 

@@ -85,10 +85,10 @@
 
 - `CPP/7zip/UI/Common/Extract.cpp` `DecompressArchive`: 79-96행 `elimIsPossible` 블록 옆에 스마트 판단을 추가한다. 105행부터의 항목 루프에서 최상위 이름 집합을 먼저 모으고, 결과에 따라 `outDir`을 `outDir + 아카이브 이름`으로 바꾼다. 아카이브 이름은 70-76행의 `correctedName` 계산을 재사용한다.
 - `CPP/7zip/UI/Common/ArchiveCommandLine.cpp`: 1462-1465행 `-spe` 옆에 스마트 모드 스위치를 추가한다.
-- `CPP/7zip/UI/Common/CompressCall.cpp:255` `ExtractArchives`: 264-265행처럼 스마트 모드 스위치를 붙이는 매개변수를 추가한다.
-- `CPP/7zip/UI/Explorer/ContextMenu.cpp`: 838-866행 메뉴 구성에 S7-01을 추가하고, 1276-1290행 `InvokeCommand`의 `case kExtract*`에서 스마트 스위치를 넘긴다. 메뉴 플래그는 `Explorer/ContextMenuFlags.h`.
-- `CPP/7zip/UI/GUI/ExtractDialog.cpp`/`ExtractDialogRes.h`: 라디오 3개와 결과 미리보기를 추가한다(`IDX_EXTRACT_ELIM_DUP` 3430은 `always`의 이중 폴더 제거로 흡수).
-- 설정 저장: `CPP/7zip/UI/Common/ZipRegistry.h:190` `CContextMenuInfo`, 대화상자 기본값은 `ZipRegistry.h` `NExtract::CInfo`.
+- `CPP/7zip/UI/Common/CompressCall.cpp:255` `ExtractArchives`: 264-265행처럼 스마트 모드 스위치를 붙이는 매개변수를 추가한다. 실행 대상은 7zG가 아니라 `JZip.exe`다([07. 기술 스택](../07-tech-stack.md) 3절).
+- `jzip-shell.dll`(`CPP/7zip/UI/Explorer/ContextMenu.cpp` 기반): 838-866행 메뉴 구성에 S7-01을 추가하고, 1276-1290행 `InvokeCommand`의 `case kExtract*`에서 스마트 스위치를 넘긴다. 메뉴 플래그는 `Explorer/ContextMenuFlags.h`.
+- `JZip.exe`(WinUI 3) S2 화면: 라디오 3개(S2-04)와 결과 미리보기(S2-05)를 새로 만든다. 기존 파일 `CPP/7zip/UI/GUI/ExtractDialog.cpp`/`ExtractDialogRes.h`는 근거로만 쓴다(`IDX_EXTRACT_ELIM_DUP` 3430은 `always`의 이중 폴더 제거로 흡수). 결과 경로 계산은 `jzip-core`.
+- 설정 저장(`jzip-core`): `CPP/7zip/UI/Common/ZipRegistry.h:190` `CContextMenuInfo`, 대화상자 기본값은 `ZipRegistry.h` `NExtract::CInfo` 기반.
 
 ## 8. 수용 기준
 

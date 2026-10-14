@@ -51,7 +51,7 @@
 
 ## 7. 구현 지점
 
-- 기능 변경 없음. 기존 `CPP/7zip/UI/Agent/AgentOut.cpp`, `ArchiveFolderOut.cpp`, `UpdateCallbackAgent.cpp`를 새 S1 툴바·드롭 영역에서 호출한다.
+- 기능 변경 없음. 기존 `CPP/7zip/UI/Agent/AgentOut.cpp`, `ArchiveFolderOut.cpp`, `UpdateCallbackAgent.cpp`(`jzip-core`)를 `JZip.exe`(WinUI 3) S1 툴바·드롭 영역에서 호출한다.
 
 ## 8. 수용 기준
 

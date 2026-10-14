@@ -54,7 +54,7 @@
 ## 7. 구현 지점
 
 - 압축 엔진: 변경 없음 (`CPP/7zip/Archive/Zip/ZipOut.cpp:111-116`).
-- FAT32 사전 경고: `CPP/7zip/UI/GUI/CompressDialog.cpp`의 확인 단계(`OnOK`, 볼륨 검사 부근 `:1216-1232`) 앞에 추가. 드라이브 파일 시스템 확인 코드는 research 자료에 없으므로 새로 작성한다.
+- FAT32 사전 경고: `JZip.exe`(WinUI 3) S3 화면의 S3-14 배너. 드라이브 파일 시스템 확인은 `jzip-core`에 새로 작성한다(research 자료에 기존 코드 없음). 기존 파일 `CPP/7zip/UI/GUI/CompressDialog.cpp`의 확인 단계(`OnOK`, 볼륨 검사 부근 `:1216-1232`)는 검사 순서의 근거로만 쓴다.
 
 ## 8. 수용 기준
 

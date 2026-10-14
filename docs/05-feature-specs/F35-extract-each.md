@@ -54,7 +54,7 @@
 
 ## 7. 구현 지점
 
-- #13과 같음: `CPP/7zip/UI/Common/Extract.cpp` `DecompressArchive`, `CPP/7zip/UI/Explorer/ContextMenu.cpp` (research #35, #13).
+- #13과 같음: `jzip-core`(`CPP/7zip/UI/Common/Extract.cpp` `DecompressArchive`), `jzip-shell.dll`(`CPP/7zip/UI/Explorer/ContextMenu.cpp`) (research #35, #13).
 - 메뉴 문구·위치: `ContextMenu.cpp:832-834`, 857-866행 (research #35).
 - 이 기능만을 위한 새 변경 지점은 없다.
 

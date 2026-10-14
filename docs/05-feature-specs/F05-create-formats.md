@@ -78,7 +78,7 @@
 
 ## 7. 구현 지점
 
-- `CPP/7zip/UI/GUI/CompressDialog.cpp` `g_Formats[]`(271행~) — 형식 목록, 기능 플래그.
+- `JZip.exe`(WinUI 3) S3 화면: 형식 카드(S3-04)와 다른 형식…(S3-18). 형식 목록·기능 플래그는 `jzip-core`로 옮긴다(기존 파일: `CPP/7zip/UI/GUI/CompressDialog.cpp` `g_Formats[]`(271행~)).
 - TAR.GZ 한 번에 만들기는 research 자료에 변경 지점이 없다. tar 출력을 gzip 인코더로 바로 넘기는 경로를 새로 설계해야 한다(§9).
 - 새 생성 형식(LZH·ISO 등)을 추가하려면 `IOutArchive`를 구현하고 `REGISTER_ARC_IO`로 등록(예: `Archive/LzhHandler.cpp`, `Archive/Iso/IsoRegister.cpp`) 후 `g_Formats[]`에 추가 — 이번 범위 밖.
 

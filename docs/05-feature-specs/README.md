@@ -6,6 +6,7 @@
 - 화면 요소 ID(`S2-04` 등): [06. GUI 명세서](../06-gui-spec.md)
 - 7-Zip 근거(파일·줄): [research/7zip-26.04-source-facts.md](../research/7zip-26.04-source-facts.md)
 - 디자인 원본: [`design/project/`](../../design/project/)
+- 기술 스택·구성 요소(`JZip.exe`, `jzip-core.lib`, `7z.dll`, `jzip-shell.dll`): [07. 기술 스택](../07-tech-stack.md)
 
 ## 목록
 
@@ -37,7 +38,7 @@
 | 24 | [F24 손상 ZIP 복구](F24-zip-repair.md) | P3 | △ | S9 |
 | 25 | [F25 비밀번호 찾기 (제외)](F25-password-recovery.md) | 제외 | ❌ | — |
 | 26 | [F26 이미지 썸네일](F26-thumbnail.md) | P2 | ❌ | S1 |
-| 27 | [F27 ARM64·포터블·스토어 배포](F27-distribution.md) | P3 | △ | 배포 |
+| 27 | [F27 ARM64·스토어 배포 (MSIX, 포터블 제외)](F27-distribution.md) | P3 | △ | 배포 |
 | 28 | [F28 다크모드](F28-dark-mode.md) | P2 | ❌ | S1 S8 |
 | 29 | [F29 고DPI·모던 아이콘](F29-high-dpi.md) | P2 | △ | 전체 |
 | 30 | [F30 해제 후 폴더 열기](F30-open-folder-after.md) | P1 | ❌ | S2 S4 |
@@ -85,7 +86,7 @@
 | 키 | 기본값 | 위치(S8 탭) | 설명 |
 
 ## 7. 구현 지점
-7-Zip 소스 기준 변경 위치(파일·클래스·함수·리소스 ID). research 자료에 있는 것만.
+j-zip 구성 요소(`JZip.exe` 화면 / `jzip-core` 로직 / `7z.dll` 핸들러 / `jzip-shell.dll`)별 구현 위치. 7-Zip 소스 위치(파일·클래스·함수·리소스 ID)는 research 자료에 있는 것만 적으며, 7zFM·7zG 화면 파일은 동작 근거로만 쓴다.
 
 ## 8. 수용 기준
 - [ ] 확인 가능한 체크리스트

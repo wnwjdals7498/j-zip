@@ -72,7 +72,7 @@ j-zip은 읽어 낸 항목들의 압축 데이터를 다시 압축하지 않고 
 
 - 읽기: `CPP/7zip/Archive/Zip/ZipIn.cpp` `CInArchive::ReadLocals`(`:2076`) 결과를 그대로 쓴다. 강제 모드는 `ZipHandler.cpp:775` `Force_ReadLocals_Mode`(`-mros`)와 같은 경로.
 - 쓰기: `CPP/7zip/Archive/Zip/ZipOut.cpp` `COutArchive`로 새 CD를 쓰고, `CPP/7zip/Archive/Zip/ZipUpdate.cpp`의 기존 항목 복사 경로(재압축 없이 복사)를 재사용한다.
-- 명령 진입점: research 자료 기준 7zFM `Tools` 메뉴(`CPP/7zip/UI/FileManager/resource.rc`, `MyLoadMenu.cpp`)에 명령을 추가하고, S9-05에서 같은 명령을 호출한다.
+- 명령 진입점: 복구 명령은 `jzip-core`에 두고 `JZip.exe`(WinUI 3) S9-05·D3에서 호출한다. research 자료가 진입점으로 든 7zFM `Tools` 메뉴(`CPP/7zip/UI/FileManager/resource.rc`, `MyLoadMenu.cpp`)는 수정하지 않는다.
 
 ## 8. 수용 기준
 

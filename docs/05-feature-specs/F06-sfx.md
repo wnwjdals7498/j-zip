@@ -56,8 +56,8 @@
 
 ## 7. 구현 지점
 
-- `CPP/7zip/UI/GUI/CompressDialog.cpp:287` `kFF_SFX`, `IDX_COMPRESS_SFX` — EXE 카드와 연결.
-- `CPP/7zip/UI/GUI/UpdateGUI.cpp:31` `kDefaultSfxModule`, `:561-564` 모듈 경로 결정 — j-zip 모듈 이름으로 교체.
+- `JZip.exe`(WinUI 3) S3 화면의 EXE 카드. SFX 가능 여부는 `jzip-core` 형식 플래그로 판단한다(기존 파일: `CPP/7zip/UI/GUI/CompressDialog.cpp:287` `kFF_SFX`, `IDX_COMPRESS_SFX`).
+- `jzip-core` 로직: SFX 모듈 경로 결정 — j-zip 모듈 이름으로 교체(기존 파일: `CPP/7zip/UI/GUI/UpdateGUI.cpp:31` `kDefaultSfxModule`, `:561-564`). SFX 모듈은 MSIX 패키지 안에 함께 넣는다.
 - 모듈 소스: `CPP/7zip/Bundles/SFXWin/SfxWin.cpp`(리소스·문구 교체 대상).
 - ZIP SFX(범위 밖)를 만들 경우: `Bundles/SFXWin/makefile`에 Zip 핸들러 객체 추가, `g_Formats` Zip 항목에 `kFF_SFX`, `UpdateGUI.cpp` 모듈 선택 변경.
 

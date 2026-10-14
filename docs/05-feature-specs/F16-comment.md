@@ -61,7 +61,7 @@
 ## 7. 구현 지점
 
 - `CPP/7zip/Archive/Zip/ZipHandler.cpp:227`: `CP_ACP` 대신 `_forceCodePage`/`_specifiedCodePage`가 있으면 그 코드페이지를 쓰고, 없으면 #17 감지 결과(또는 기존 `GetCodePage()` 규칙)를 쓰도록 고친다.
-- `CPP/7zip/UI/FileManager/Panel.cpp`/`PanelFolderChange.cpp`: 폴더(아카이브)를 열 때 `IGetFolderArcProps`로 `kpidComment`를 읽어 미리보기 창에 넘긴다(`PanelMenu.cpp:172` `CPanel::Properties()`의 읽기 방식 참고).
+- `jzip-core`: 아카이브를 열 때 `IGetFolderArcProps`로 `kpidComment`를 읽어 `JZip.exe`(WinUI 3) S1-18에 넘긴다. 기존 파일 `CPP/7zip/UI/FileManager/Panel.cpp`/`PanelFolderChange.cpp`, `PanelMenu.cpp:172` `CPanel::Properties()`의 읽기 방식을 참고한다.
 
 ## 8. 수용 기준
 

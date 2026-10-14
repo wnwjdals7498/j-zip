@@ -47,7 +47,7 @@
 
 - 오류·경고가 있으면 S9가 뜨고 원본은 남는다(06 문서 S2-07 "오류가 있으면 실행하지 않음").
 - `.tar.gz` 한 번에 풀기(#12)에서는 사용자가 연 바깥 파일(`.tar.gz`)을 보낸다. 중간 `.tar`는 임시 결과이므로 대상이 아니다.
-- 7zFM(S1)에서 지금 열려 있는 아카이브를 풀면, 휴지통으로 보내기 전에 S1의 해당 탭(또는 패널)을 닫아 파일 잠금을 푼다. 다른 프로세스가 잡고 있으면 FR-31-7.
+- S1에서 지금 열려 있는 아카이브를 풀면, 휴지통으로 보내기 전에 S1의 해당 탭(또는 패널)을 닫아 파일 잠금을 푼다. 다른 프로세스가 잡고 있으면 FR-31-7.
 - 풀 위치가 원본 아카이브와 같은 파일 이름을 덮어쓰는 경우(드묾)는 원본을 이미 덮어쓴 것이므로 휴지통 처리를 하지 않는다.
 - #30 폴더 열기와 함께 켜져 있으면, 휴지통 이동을 먼저 하고 폴더를 연다(탐색기에 원본이 남아 보이지 않도록).
 - 휴지통 이동은 사용자 확인 대화상자를 띄우지 않는다(옵션을 켠 것이 곧 확인).
@@ -61,10 +61,10 @@
 ## 7. 구현 지점
 
 - 실행 위치: `CPP/7zip/UI/Common/Extract.cpp` `Extract()`(288행)에서 아카이브별로 오류 없이 끝났을 때 처리. 멀티볼륨이면 `CArchiveLink`의 볼륨 경로 전체 (research #31).
-- 휴지통: `SHFileOperation(FO_DELETE, FOF_ALLOWUNDO)` (research #31). `Update.cpp`의 `DeleteFileAlways`는 쓰지 않는다.
-- UI: `CPP/7zip/UI/GUI/ExtractDialog.cpp`/`ExtractDialogRes.h` (research #31).
+- 휴지통: `IFileOperation`에 `FOFX_RECYCLEONDELETE`를 지정해 `DeleteItems`로 보낸다([07. 기술 스택](../07-tech-stack.md) 7절). 휴지통을 쓸 수 없는 위치에서는 영구 삭제로 넘어가지 않고 원본을 남겨야 하며(FR-31-6), 이동 실패는 FR-31-7로 처리한다. 이를 보장하는 방법은 9절 미결. research #31에 적힌 `SHFileOperation(FO_DELETE, FOF_ALLOWUNDO)`는 쓰지 않는다. `Update.cpp`의 `DeleteFileAlways`도 쓰지 않는다.
+- UI: `JZip.exe`(WinUI 3) S2 화면의 S2-07, S4의 S4-10·S4-11, S8의 S8-02. 기존 파일 `CPP/7zip/UI/GUI/ExtractDialog.cpp`/`ExtractDialogRes.h`(research #31)는 현재 동작 근거로만 쓴다.
 - CLI 스위치: `CPP/7zip/UI/Common/ArchiveCommandLine.cpp`에 추가 (research #31).
-- 저장: `CPP/7zip/UI/Common/ZipRegistry.h` `NExtract::CInfo` (#30과 같은 구조체, research #30).
+- 저장: `jzip-core` 설정(기존 파일 `CPP/7zip/UI/Common/ZipRegistry.h` `NExtract::CInfo` 기반, #30과 같은 구조체, research #30).
 
 ## 8. 수용 기준
 
@@ -83,7 +83,8 @@
 
 - 범위 밖: 압축 후 원본 삭제(S3-10, `-sdel`)를 휴지통 방식으로 바꾸는 것. 필요하면 별도 기능으로 다룬다.
 - 미결: CLI 새 스위치의 이름. research 자료는 추가 위치만 적었다.
-- 미결: 휴지통 사용 가능 여부를 미리 판별하는 방법. `FOF_ALLOWUNDO`는 휴지통을 쓸 수 없는 위치에서 영구 삭제로 바뀌거나 확인을 물을 수 있어서, 호출 전에 판별하거나 `IFileOperation` 등 다른 API를 써야 할 수 있다. research 자료에서는 확인하지 않았다.
+- 해결: 휴지통 API는 `IFileOperation`(`FOFX_RECYCLEONDELETE`)로 정했다(07 문서 7절). `FOF_ALLOWUNDO`는 휴지통을 쓸 수 없는 위치에서 영구 삭제로 바뀌거나 확인을 물을 수 있어 쓰지 않는다.
+- 미결: 휴지통을 쓸 수 없는 위치(네트워크 공유 등)에서 `IFileOperation`이 영구 삭제로 넘어가지 않게 하는 방법(호출 전 위치 판별, 진행 싱크에서 영구 삭제 확인을 거부하는 방식 등)은 구현 때 검증한다.
 - 해결: 화면은 "S2 S4 S8"로 통일했다(03, 05 README). FeatureMap 디자인의 "S2 S8" 표기는 디자인 쪽에서 고친다.
 - 해결: S2-07 문구는 "끝나면 압축 파일을 휴지통으로"로 통일했다(06).
 - 06에 반영됨 (S4-11). 오류·경고가 있으면 원본을 처리하지 않으므로 S9에는 따로 두지 않는다.

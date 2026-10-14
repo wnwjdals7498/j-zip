@@ -42,7 +42,7 @@
 | S7-08 | 파일·폴더 | "압축 옵션 지정…" | S3 |
 | S7-09 | 항상 | "메뉴 항목 편집…" | S8 탐색기 메뉴 탭 |
 | S7-11 | 일반 파일·폴더 | "{이름}.zip으로 압축", "{이름}.7z로 압축" | 바로 압축 → S4 |
-| S7-12 | Win11 "추가 옵션 표시", Win10 이하 | 위와 같은 항목 | 예전 `IContextMenu` |
+| S7-12 | Win11 "추가 옵션 표시", Windows 10 | 위와 같은 항목 | 예전 메뉴. 등록 방식은 F19 SP-1 결과로 확정 |
 | S7-13 | j-zip 하위 메뉴 안 | "해시 값 계산 ▸" | 하위 메뉴로 CRC/SHA 등 해시 계산(7-Zip 기존 기능 유지) |
 | S8-05 | 설정 › 탐색기 메뉴 | 항목별 "맨 위에 / j-zip 안에 / 숨김" | 위치 저장 |
 | S8-06 | 설정 › 탐색기 메뉴 | "메뉴에 아이콘 표시", "Shift 누를 때만 표시" | — |
@@ -61,9 +61,11 @@
 
 ## 7. 구현 지점
 
+셸 확장은 `jzip-shell.dll`(7-Zip `UI/Explorer` 기반, XAML 없음)이며, 메뉴 명령은 `JZip.exe`를 실행 인자와 함께 띄운다(현재 7zG 역할, [07. 기술 스택](../07-tech-stack.md) 3절). S8 설정 화면은 `JZip.exe`에 새로 만든다.
+
 - `CPP/7zip/UI/Explorer/ContextMenu.cpp` `QueryContextMenu`(700~1100행대), `g_Commands`(`:273-283`): 항목 이름·순서를 바꾼다.
 - `CPP/7zip/UI/Explorer/ContextMenuFlags.h`, `CPP/7zip/UI/Common/ZipRegistry.h:190` `CContextMenuInfo`: S8-05의 3단 위치를 저장할 수 있게 한다(현재는 켜기/끄기 체크 목록).
-- 등록은 기존 `DllRegisterServer`(`DllExportsExplorer.cpp:237`)와 설치기(`7zipInstall.c:895-917`)를 j-zip 이름·CLSID로 바꿔 쓴다.
+- 등록: 기존 `DllRegisterServer`(`DllExportsExplorer.cpp:237`)와 설치기(`7zipInstall.c:895-917`)의 레지스트리 등록은 쓰지 않고, j-zip CLSID를 MSIX 매니페스트(`windows.comServer`, `windows.fileExplorerContextMenus`)에 선언한다(F19 7절). 예전 메뉴 표시 방식은 SP-1에서 확인한다.
 
 ## 8. 수용 기준
 
@@ -78,6 +80,6 @@
 ## 9. 범위 밖·미결 사항
 
 - 범위 밖: Win11 새 메뉴 최상단 표시(#19), 항목 선택 UI 개선의 세부(#34).
-- 미결: 7-Zip과 j-zip을 함께 설치했을 때 두 셸 확장이 나란히 보이는지, CLSID·등록 키 이름 충돌이 없는지 확인이 필요하다.
+- 미결: 7-Zip과 j-zip을 함께 설치했을 때 두 셸 확장이 나란히 보이는지 확인이 필요하다. j-zip은 별도 CLSID를 MSIX 매니페스트에 선언하고 7-Zip의 `shellex` 레지스트리 키를 쓰지 않으므로 등록 키는 겹치지 않는다.
 - 해결: 제품 화면의 하위 메뉴 이름은 "j-zip"으로 통일했다(06, 04). ContextMenu·Settings 디자인의 "7-Zip" 표기는 디자인 쪽에서 고친다.
 - 06에 반영됨 (S7-13 "해시 값 계산 ▸", S8-05 항목 목록에 포함)

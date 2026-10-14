@@ -63,7 +63,7 @@ j-zip은 같은 테스트 엔진을 쓰고, 결과를 S9에서 요약·목록·�
 
 ## 7. 구현 지점
 
-- 기능 변경 없음. `CPP/7zip/UI/Common/CompressCall.cpp:278` `TestArchives`와 7zG 테스트 결과를 새 S9 창에 넘기는 표시 계층만 추가한다. 현재 결과 표시는 `CPP/7zip/UI/FileManager/MessagesDialog.cpp`와 `ProgressDialog2.cpp`.
+- 테스트 로직은 변경 없음(`jzip-core`). `CPP/7zip/UI/Common/CompressCall.cpp:278` `TestArchives` 경로의 테스트 결과(항목별 오류 종류)를 `JZip.exe`(WinUI 3) S9 화면에 넘기는 표시 계층만 새로 만든다. 현재 결과 표시(`CPP/7zip/UI/FileManager/MessagesDialog.cpp`, `ProgressDialog2.cpp`)는 근거로만 쓴다.
 
 ## 8. 수용 기준
 

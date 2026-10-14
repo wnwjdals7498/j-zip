@@ -12,10 +12,12 @@
 | [01. REA 개요](docs/01-rea-overview.md) | 분석 보조 도구 REA(morluto/rea) 요약과 이 프로젝트에서의 역할 |
 | [02. 개발 계획](docs/02-development-plan.md) | 준비, 소스 구조, 개발 단계, 테스트, 배포, 라이선스 |
 | [03. 기능 벤치마크](docs/03-feature-benchmark.md) | 반디집 대비 7-Zip 기능 비교 (#1–#36), 우선순위 |
-| [04. GUI 레퍼런스](docs/04-gui-reference.md) | 화면 S1–S9 명세, 디자인 원칙·토큰, UI 기술 선택지 |
+| [04. GUI 레퍼런스](docs/04-gui-reference.md) | 화면 S1–S9 명세, 디자인 원칙·토큰, UI 기술(WinUI 3로 확정) |
 | [05. 기능 세부 명세](docs/05-feature-specs/README.md) | 기능 #1–#36별 요구사항, 반디집 참고 출처, 7-Zip 근거, 연결된 GUI 요소, 수용 기준 |
 | [06. GUI 명세서](docs/06-gui-spec.md) | 창 유형, 컴포넌트(C01–C22), 키보드·문구·접근성 규칙, 화면별 요소 ID(S1-01…), 화면 흐름 |
+| [07. 기술 스택](docs/07-tech-stack.md) | 언어·UI(WinUI 3 + C++/WinRT)·빌드·배포(MSIX)·의존성 결정, 구성 요소(JZip.exe·jzip-core·jzip-shell), 선행 검증(SP-1~6) |
 | [7-Zip 26.04 소스 검증](docs/research/7zip-26.04-source-facts.md) | 기능별 현재 구현 근거(파일·줄)와 변경 지점 |
+| [기술 스택 조사](docs/research/tech-research-2026-10.md) | 07 결정의 조사 근거(NanaZip, Windows App SDK, MSIX·셸 등록, ALZ/EGG, LZ4, CI), 기준일 2026-10-14 |
 | [GUI 디자인 원본](design/) | Claude Design 프로젝트 폴더 (`canvas.json` + 화면별 `.dc.html`), 형식 설명 포함 |
 
 ## 우선순위 요약
@@ -27,4 +29,4 @@
 
 ## 상태
 
-기획 단계. 코드 없음.
+기획 단계 — 기술 스택 확정, 시제품(SP-1~6) 전

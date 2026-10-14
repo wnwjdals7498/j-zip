@@ -50,7 +50,7 @@
 - 풀 위치가 네트워크 경로이고 연결이 끊겼으면 열기를 건너뛴다(오류 대화상자 없음).
 - #31(원본 휴지통)과 함께 켜져 있으면, 휴지통 이동 후 폴더를 연다. 순서가 바뀌어도 결과 폴더는 영향받지 않는다.
 - #32에서 진행창이 자동으로 닫히는 경우에도 폴더 열기는 실행된다.
-- 7zFM 안에서 드래그로 꺼낸 경우(#11)는 사용자가 놓은 위치가 이미 보이므로 적용하지 않는다.
+- S1에서 드래그로 꺼낸 경우(#11)는 사용자가 놓은 위치가 이미 보이므로 적용하지 않는다.
 
 ## 6. 설정
 
@@ -60,11 +60,10 @@
 
 ## 7. 구현 지점
 
-- 완료 후 실행: `CPP/7zip/UI/GUI/ExtractGUI.cpp` `CThreadExtracting::ProcessWasFinished_GuiVirt`(94행) 또는 `ExtractGUI()`(167행) 끝, 또는 `CPP/7zip/UI/FileManager/ProgressDialog2.cpp` `CProgressDialog::OnExternalCloseMessage`(991행) (research #30).
-- 옵션 UI: `CPP/7zip/UI/GUI/ExtractDialog.cpp` `OnInit`(137행)/`OnOK`(299행)에 체크박스 추가, `ExtractDialogRes.h`에 ID 추가 (research #30).
-- 저장: `CPP/7zip/UI/Common/ZipRegistry.h` `NExtract::CInfo` (research #30).
-- 진행창 체크박스(S4-05): `ProgressDialog2Res.h`에 해당 ID가 없으므로 새로 추가 (research #32).
-- 컨텍스트 메뉴 경로: `UI/Common/CompressCall.cpp:255` `ExtractArchives` → 7zG `x` (research #12). 7zG가 S8 저장값을 읽는지, 새 스위치로 넘길지는 9절 미결.
+- 완료 후 실행: `JZip.exe`의 해제 완료 처리(S4)에서 결과 위치를 연다. 현재 완료 지점의 근거는 `CPP/7zip/UI/GUI/ExtractGUI.cpp` `CThreadExtracting::ProcessWasFinished_GuiVirt`(94행)·`ExtractGUI()`(167행) 끝, `CPP/7zip/UI/FileManager/ProgressDialog2.cpp` `CProgressDialog::OnExternalCloseMessage`(991행) (research #30).
+- 옵션 UI: `JZip.exe`(WinUI 3) S2-06·S4-05·S8-02를 새로 만든다. 기존 파일 `CPP/7zip/UI/GUI/ExtractDialog.cpp` `OnInit`(137행)/`OnOK`(299행), `ExtractDialogRes.h`, `ProgressDialog2Res.h`는 근거로만 쓴다 (research #30, #32).
+- 저장: `jzip-core` 설정(기존 `CPP/7zip/UI/Common/ZipRegistry.h` `NExtract::CInfo` 기반, research #30).
+- 컨텍스트 메뉴 경로: `jzip-shell.dll` → `JZip.exe --extract …`(현재 `UI/Common/CompressCall.cpp:255` `ExtractArchives` → 7zG `x`, research #12). `JZip.exe`가 S8 저장값을 읽는지, 실행 인자로 넘길지는 9절 미결.
 
 ## 8. 수용 기준
 
@@ -80,7 +79,7 @@
 
 ## 9. 범위 밖·미결 사항
 
-- 범위 밖: 결과 폴더를 7zFM(S1)에서 여는 옵션, 압축 후 결과 파일 위치 열기.
-- 미결: S7에서 시작한 7zG 해제가 S8 설정을 레지스트리에서 직접 읽을지, `CompressCall.cpp`가 새 명령줄 스위치를 넘길지. research 자료에는 #31용 CLI 스위치 추가만 언급돼 있다.
+- 범위 밖: 결과 폴더를 S1에서 여는 옵션, 압축 후 결과 파일 위치 열기.
+- 미결: S7에서 시작한 `JZip.exe` 해제가 S8 설정을 직접 읽을지, `jzip-shell.dll`이 새 실행 인자로 넘길지. research 자료에는 #31용 CLI 스위치 추가만 언급돼 있다.
 - 미결: FR-30-5에서 상위 폴더가 서로 다른 경우의 처리(첫 위치만 열기)는 임시 규칙이다. 사용자 테스트 후 확정한다.
 - 06에 반영됨 (S9-12)

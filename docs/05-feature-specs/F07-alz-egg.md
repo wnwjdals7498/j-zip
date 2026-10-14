@@ -30,7 +30,7 @@
 - FR-07-6 지원하지 않는 압축 방식의 항목은 해당 항목만 실패로 처리하고 S9에 표시한다. 아카이브 전체를 실패시키지 않는다.
 - FR-07-7 ALZ/EGG에 파일 추가·삭제·이름 변경(#14), 새로 만들기는 제공하지 않는다. S1-04, S1-05는 비활성 + 툴팁("이 형식은 읽기만 가능").
 - FR-07-8 파일명 인코딩 정보가 없는 항목은 #17(F17)의 감지 규칙을 따르고, S1-12·S2-10을 표시한다.
-- FR-07-9 S8-07 연결 프로그램 목록에 `.alz`, `.egg`를 추가한다.
+- FR-07-9 MSIX 매니페스트 `uap:FileTypeAssociation`에 `.alz`, `.egg`를 넣고, S8-07 연결 프로그램 목록에 표시한다.
 
 ## 4. GUI 명세
 
@@ -44,7 +44,7 @@
 | S1-12 / S2-10 | 인코딩 정보 없는 이름 중 ASCII가 아닌 것이 있을 때 | "파일명: {인코딩} ▾" / "자동 (감지 결과)" | F17 |
 | S6-03 | 암호 항목 | 암호 입력 | F04 |
 | S7-01 / S7-02 | `.alz`/`.egg` 우클릭 | "여기에 풀기 (스마트)", "\"{이름}\"에 풀기" | 다른 형식과 같음 |
-| S8-07 | 연결 프로그램 탭 | `.alz`, `.egg` 체크 항목 | 연결 등록 |
+| S8-07 | 연결 프로그램 탭 | 목록에 `.alz`, `.egg` 표시 | [Windows 기본 앱 설정 열기] 버튼(`ms-settings:defaultapps`)으로 사용자가 j-zip을 고름 |
 
 ## 5. 동작 규칙과 예외
 
@@ -56,13 +56,15 @@
 
 | 키 | 기본값 | 위치(S8 탭) | 설명 |
 |---|---|---|---|
-| `Assoc.alz` | 켬 | 연결 프로그램 | `.alz`를 j-zip으로 열기 |
-| `Assoc.egg` | 켬 | 연결 프로그램 | `.egg`를 j-zip으로 열기 |
+| 해당 없음 | — | 연결 프로그램 (S8-07) | 확장자 연결은 MSIX 매니페스트로 등록하고, 기본 앱 선택은 Windows 설정이 저장한다. j-zip 자체 설정 키는 없다 |
 
 ## 7. 구현 지점
 
-- 새 핸들러 `CPP/7zip/Archive/AlzHandler.cpp`, `EggHandler.cpp`를 만들고 `REGISTER_ARC_I`(읽기 전용)로 등록.
+- `7z.dll`에 새 핸들러 `CPP/7zip/Archive/AlzHandler.cpp`, `EggHandler.cpp`를 만들고 `REGISTER_ARC_I`(읽기 전용)로 등록.
+- ALZ: unalz(원본 C++, **zlib License**)를 `third_party/`에 소스 동봉하고 `IInArchive` 핸들러로 감싼다. unalz는 구형(2009년 이전) ALZ만 지원한다([07. 기술 스택](../07-tech-stack.md) 7절).
+- EGG: 공개 공식 스펙이 없으므로 `alkegi/unegg`(Rust, **MIT**) 구현을 읽고 C++로 새로 작성한다. LZMA는 7-Zip 내장 코덱을 쓰고, AZO 압축과 LEA 암호는 직접 구현해야 한다. Rust 빌드를 nmake/MSVC 체인에 넣지 않는다.
 - `CPP/7zip/Bundles/Format7zF/makefile`의 `AR_OBJS`에 추가. (research 자료: Format7zF makefile 내용 자체는 열어 보지 않음.)
+- 고지: unalz(zlib), unegg(MIT) 고지를 `THIRD_PARTY_NOTICES.md`에 넣는다. `dterracino/unegg`의 스펙 PDF는 라이선스가 불명이라 저장소에 넣지 않고 링크만 참조한다.
 
 ## 8. 수용 기준
 
@@ -78,8 +80,8 @@
 ## 9. 범위 밖·미결 사항
 
 - 범위 밖: ALZ/EGG 만들기, 수정.
-- 미결: 공개 구현체(해제 코드)의 라이선스가 LGPL과 맞는지 확인 필요(03 비고). 구현체를 쓸지 형식 문서를 보고 새로 작성할지 결정해야 한다.
-- 미결: 지원할 압축 방식·암호 방식의 범위. research 자료에 형식 정보가 없다.
+- 해결: ALZ는 unalz(zlib, LGPL 호환 허용형)를 동봉하고, EGG는 `alkegi/unegg`(MIT)를 참고해 직접 구현한다(07 문서 7절). 법률 자문은 아니다.
+- 미결: 지원할 압축 방식·암호 방식의 범위. 조사 자료(Bandizip 도움말) 기준 ALZ = Deflate, Obfuscated Deflate, bzip2 변형, ZipCrypto, 분할 / EGG = Deflate, Bzip2, LZMA, AZO, AES128/256, LEA128/256, 솔리드, 분할, UTF-8 파일명. unalz가 지원하지 않는 신형 ALZ 처리 방식(`alkegi/unalz`(MIT) 참고 여부)도 정해야 한다.
 - 미결: ALZ/EGG의 파일명 인코딩(코드페이지 고정인지, 유니코드 표시가 있는지)과 분할 볼륨 이름 규칙은 확인되지 않았다.
-- 참고: 반디집 공식 기능 목록에는 ALZ만 있고 EGG는 없다. "반디집 수준" 근거는 ALZ에만 해당하며, 03 #7 비고에 이 사실을 적었다.
+- 미결(우선순위 재검토): 반디집 공식 기능 목록에는 ALZ만 있고 EGG는 없다. "반디집 수준" 근거는 ALZ에만 해당하고 EGG는 AZO·LEA까지 직접 구현해야 하므로, EGG를 ALZ와 같은 P2로 둘지 다시 정한다(07 문서 7절, 03 #7 비고).
 - 해결: 06 S1-12·S2-10의 표시 조건을 "항목 이름에 인코딩 정보가 없고(ZIP UTF-8 플래그 없음, ALZ/EGG 등) 그중 ASCII가 아닌 이름이 있을 때"로 넓혔다(FR-07-8).

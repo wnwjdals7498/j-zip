@@ -65,9 +65,8 @@
 
 ## 7. 구현 지점
 
-- `CPP/7zip/UI/FileManager/SplitUtils.cpp:61` `k_Sizes[]`, `:75` `AddVolumeItems()` — 프리셋 목록 교체.
-- `CPP/7zip/UI/GUI/CompressDialog.cpp:495` 콤보 채우기, `:1216-1232` 값 검사(인라인 오류로 바꿀 위치).
-- `CPP/7zip/UI/GUI/CompressDialogRes.h:10` `IDC_COMPRESS_VOLUME`.
+- `JZip.exe`(WinUI 3) S3 화면: S3-07 드롭다운, S3-13 조각 이름 안내, 인라인 오류를 새로 만든다. 기존 파일 `CPP/7zip/UI/GUI/CompressDialog.cpp:495`(콤보 채우기), `:1216-1232`(값 검사), `CompressDialogRes.h:10` `IDC_COMPRESS_VOLUME`은 현재 동작 근거로만 쓴다.
+- `jzip-core` 로직: 프리셋 목록과 크기 문자열 해석·검사. 기존 파일 `CPP/7zip/UI/FileManager/SplitUtils.cpp:61` `k_Sizes[]`, `:75` `AddVolumeItems()`의 규칙을 옮겨 프리셋을 교체한다.
 - 사용자 프리셋 저장소는 research 자료에 기존 위치가 없음. 새로 둔다(§9).
 
 ## 8. 수용 기준

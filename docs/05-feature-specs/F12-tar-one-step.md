@@ -69,8 +69,8 @@ research 자료의 두 가지 방식 중 하나를 고른다.
 
 - (a) `Archive/GzHandler.cpp`, `Bz2Handler.cpp`, `XzHandler.cpp`(`:383` 빈 case), `ZstdHandler.cpp`의 `GetArchiveProperty`에서 단일 항목이 tar일 때 `kpidMainSubfile = 0`을 돌려줌 → `CArchiveLink::Open`(`OpenArchive.cpp:3221`, `:3309`)이 자동으로 안쪽을 엶. FM 탐색 동작까지 바뀌므로 FR-12-8을 지키려면 옵션으로 켜고 끌 수 있어야 함.
 - (b) `CPP/7zip/UI/Common/Extract.cpp` `DecompressArchive`(36행) 또는 `Extract`(288행)에서 결과가 tar 하나면 이어서 풂.
-- S2-08 컨트롤은 `CPP/7zip/UI/GUI/ExtractDialog.cpp`/`ExtractDialogRes.h`에 추가, 기본값 저장은 `UI/Common/ZipRegistry.h` `NExtract::CInfo`(research 자료 #30과 같은 위치).
-- 우클릭 경로: `UI/Common/CompressCall.cpp:255` `ExtractArchives`가 넘기는 명령줄에 이 옵션을 반영.
+- S2-08 컨트롤은 `JZip.exe`(WinUI 3) S2 화면에 새로 만든다(기존 파일 `CPP/7zip/UI/GUI/ExtractDialog.cpp`/`ExtractDialogRes.h`는 근거로만 사용). 기본값 저장은 `jzip-core` 설정(기존 `UI/Common/ZipRegistry.h` `NExtract::CInfo` 기반, research 자료 #30과 같은 위치).
+- 우클릭 경로: `jzip-shell.dll`이 `JZip.exe`에 넘기는 실행 인자에 이 옵션을 반영한다(기존 `UI/Common/CompressCall.cpp:255` `ExtractArchives`의 7zG 명령줄 구성 기반).
 
 ## 8. 수용 기준
 

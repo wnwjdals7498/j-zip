@@ -65,11 +65,11 @@ j-zip은 파일 저장 자체를 감시해 저장할 때마다 갱신 여부를 
 
 ## 7. 구현 지점
 
-- `CPP/7zip/UI/FileManager/PanelItemOpen.cpp`
-  - `MyThreadFunction`(`:1133`): 프로세스 종료 대기 대신(또는 함께) 파일 변경 감시를 넣는다.
-  - `CPanel::OnOpenItemChanged`(`:1037`): 갱신을 반복 호출할 수 있게 한다.
+- `jzip-core` 로직(임시 추출·기본 앱 실행·변경 감시·갱신)과 `JZip.exe`(WinUI 3) S1-20·D1 화면. 기존 파일 `CPP/7zip/UI/FileManager/PanelItemOpen.cpp`의 아래 동작을 근거로 옮긴다.
+  - `MyThreadFunction`(`:1133`): 프로세스 종료 대기 동작. j-zip은 대신(또는 함께) 파일 변경 감시를 한다.
+  - `CPanel::OnOpenItemChanged`(`:1037`): 갱신 동작. j-zip은 반복 호출할 수 있게 한다.
   - `CPanel::OpenItemInArchive`(`:1484`), `StartEditApplication`(`:719`): 기본 앱 실행 경로.
-  - `IDS_WANT_UPDATE_MODIFIED_FILE`(`:1281`): 문구를 FR-15-3으로 바꾼다.
+  - `IDS_WANT_UPDATE_MODIFIED_FILE`(`:1281`): 현재 질문 문구. j-zip D1-01 문구는 FR-15-3을 따른다.
 
 ## 8. 수용 기준
 

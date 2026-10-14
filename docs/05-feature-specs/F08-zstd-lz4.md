@@ -32,7 +32,7 @@
 - FR-08-5 ZSTD 해제는 7-Zip 동작을 유지한다. `.tar.zst`, `.tzst`는 #12 대상이다.
 - FR-08-6 S1-21 형식 칸에 "ZSTD" 또는 "LZ4"를 표시한다.
 - FR-08-7 ZSTD·LZ4 생성은 제공하지 않는다(S3 형식 목록에 없음).
-- FR-08-8 S8-07 연결 프로그램 목록에 `.zst`, `.lz4`를 추가한다.
+- FR-08-8 MSIX 매니페스트 `uap:FileTypeAssociation`에 `.zst`, `.lz4`를 넣고, S8-07 연결 프로그램 목록에 표시한다.
 
 ## 4. GUI 명세
 
@@ -42,7 +42,7 @@
 | S1-21 | 항상 | "ZSTD" / "LZ4" | — |
 | S2-08 | `.tar.zst`, `.tar.lz4` 등일 때 | tar 한 번에 | F12 |
 | S7-01 / S7-02 | 우클릭 | 다른 형식과 같음 | — |
-| S8-07 | 연결 프로그램 탭 | `.zst`, `.lz4` | 연결 등록 |
+| S8-07 | 연결 프로그램 탭 | 목록에 `.zst`, `.lz4` 표시 | [Windows 기본 앱 설정 열기] 버튼(`ms-settings:defaultapps`)으로 사용자가 j-zip을 고름 |
 
 ## 5. 동작 규칙과 예외
 
@@ -54,13 +54,13 @@
 
 | 키 | 기본값 | 위치(S8 탭) | 설명 |
 |---|---|---|---|
-| `Assoc.zst` | 켬 | 연결 프로그램 | `.zst`를 j-zip으로 열기 |
-| `Assoc.lz4` | 켬 | 연결 프로그램 | `.lz4`를 j-zip으로 열기 |
+| 해당 없음 | — | 연결 프로그램 (S8-07) | 확장자 연결은 MSIX 매니페스트로 등록하고, 기본 앱 선택은 Windows 설정이 저장한다. j-zip 자체 설정 키는 없다 |
 
 ## 7. 구현 지점
 
-- LZ4 디코더를 `CPP/7zip/Compress/`에 추가.
-- LZ4 핸들러를 `CPP/7zip/Archive/`에 `ZstdHandler.cpp`를 본떠 추가하고 읽기 전용으로 등록.
+- LZ4 라이브러리 **1.10.0**(`lib/`, **BSD-2-Clause**)을 `third_party/`에 소스 동봉하고, 이를 감싸는 디코더를 `CPP/7zip/Compress/`에 추가한다. 7-Zip ZS(mcmilk/7-Zip-zstd, LGPL)가 같은 방식(LZ4 v1.10.0 번들)으로 포함하므로 핸들러 구조를 참고한다([07. 기술 스택](../07-tech-stack.md) 7절).
+- LZ4 핸들러를 `7z.dll`의 `CPP/7zip/Archive/`에 `ZstdHandler.cpp`를 본떠 추가하고 읽기 전용으로 등록.
+- LZ4 BSD 고지를 `THIRD_PARTY_NOTICES.md`에 넣는다.
 - 포맷 등록 후 빌드 목록에 포함(Format7zF makefile — research 자료에서 내용은 확인하지 않음).
 
 ## 8. 수용 기준
@@ -75,6 +75,6 @@
 ## 9. 범위 밖·미결 사항
 
 - 범위 밖: ZSTD·LZ4 생성(ZSTD 인코더 소스 없음).
-- 미결: LZ4 디코더를 새로 작성할지 외부 구현을 가져올지, 그리고 라이선스 확인. research 자료에 후보가 없다.
+- 해결: LZ4 1.10.0 공식 라이브러리(BSD-2-Clause, LGPL 호환)를 동봉한다(07 문서 7절). 법률 자문은 아니다.
 - 미결: LZ4 레거시 형식과 Skippable 프레임 처리 범위.
 - 해결: 06 S2-08 표시 대상에 `.tzst`를 넣었고, LZ4 핸들러가 들어가면 `.tar.lz4`도 포함한다고 적었다(FR-08-4/5).

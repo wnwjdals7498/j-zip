@@ -54,7 +54,7 @@
 
 ## 7. 구현 지점
 
-- `CPP/7zip/UI/GUI/CompressDialog.cpp:704` `SetNumThreads()`, `:711-714` 활성 판단, `:1144` 값 읽기. 기존 로직을 새 S3-10 컨트롤에 연결만 한다.
+- `JZip.exe`(WinUI 3) S3 화면의 S3-10 스레드 컨트롤과 S3-15. 스레드 수 목록·활성 판단·메모리 추정 로직은 `jzip-core`로 옮긴다(기존 파일: `CPP/7zip/UI/GUI/CompressDialog.cpp:704` `SetNumThreads()`, `:711-714` 활성 판단, `:1144` 값 읽기).
 - 압축 엔진: 변경 없음.
 
 ## 8. 수용 기준

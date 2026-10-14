@@ -61,8 +61,8 @@
 
 ## 7. 구현 지점
 
-- `CPP/7zip/UI/FileManager/PanelDrag.cpp` `CPanel::OnDrag`(1500행), `CDataObject`(476행), `CDropSource`(1219행).
-- 탐색기 대상 지연 추출: `CFSTR_FILEDESCRIPTOR`/`CFSTR_FILECONTENTS` 가상 파일 형식 추가(현재 코드에 없음).
+- `JZip.exe`(WinUI 3) S1 목록(S1-14)의 끌기 시작 처리와 드롭 영역(S1-15)을 새로 만든다. 기존 파일 `CPP/7zip/UI/FileManager/PanelDrag.cpp` `CPanel::OnDrag`(1500행), `CDataObject`(476행), `CDropSource`(1219행)는 현재 끌기 동작의 근거로 쓰고, OLE 데이터 개체 구현은 참고해 옮긴다.
+- 탐색기 대상 지연 추출: `CFSTR_FILEDESCRIPTOR`/`CFSTR_FILECONTENTS` 가상 파일 형식 추가(현재 코드에 없음). 추출 자체는 `jzip-core`가 한다. WinUI 3 끌어 놓기 API에서 이 형식을 직접 넘기는 방법은 구현 때 확인한다.
 
 ## 8. 수용 기준
 
