@@ -42,7 +42,7 @@ a{color:#1F6FEB}a:hover{color:#174EA6}
           <span style="color: #8C959F; font-family: Consolas, monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{n.bad}}</span>
         </div>
       </sc-for>
-      <div style="padding: 6px 12px; font-size: 11px; color: #57606A">왼쪽: 선택한 인코딩 · 오른쪽: 기존 7-Zip 표시</div>
+      <div style="padding: 6px 12px; font-size: 11px; color: #57606A">왼쪽: 선택한 인코딩 · 오른쪽: 변경 전 표시</div>
     </div>
   </div>
   <div style="display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: #F5F6F8; border-top: 1px solid #D8DCE1">
@@ -61,7 +61,7 @@ class Component extends DCLogic {
       { name: 'UTF-8', score: '12%' },
       { name: '일본어 (Shift-JIS)', score: '9%' },
       { name: '중국어 간체 (GBK)', score: '7%' },
-      { name: '서유럽 (CP437)', score: '기본값' }
+      { name: '영어 DOS (CP437)', score: '기본값' }
     ];
     const encs = list.map((e) => ({
       ...e, on: !!e.on,

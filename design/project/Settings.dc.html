@@ -45,13 +45,13 @@ a{color:#1F6FEB}a:hover{color:#174EA6}
 
       <div style="border: 1px solid #D8DCE1; border-radius: 8px; overflow: hidden">
         <div style="display: grid; grid-template-columns: 1fr 100px 100px 70px; gap: 8px; padding: 8px 14px; background: #F5F6F8; border-bottom: 1px solid #D8DCE1; font-size: 12px; color: #57606A">
-          <span>항목</span><span style="text-align: center">맨 위에</span><span style="text-align: center">7-Zip 안에</span><span style="text-align: center">숨김</span>
+          <span>항목</span><span style="text-align: center">맨 위에</span><span style="text-align: center">j-zip 안에</span><span style="text-align: center">숨김</span>
         </div>
         <sc-for list="{{items}}" as="it" hint-placeholder-count="7">
           <div style="display: grid; grid-template-columns: 1fr 100px 100px 70px; gap: 8px; align-items: center; padding: 7px 14px; border-bottom: 1px solid #EEF0F2">
             <span>{{it.name}}</span>
             <span style="text-align: center"><input type="radio" name="{{it.key}}" checked="{{it.top}}" aria-label="맨 위에"></span>
-            <span style="text-align: center"><input type="radio" name="{{it.key}}" checked="{{it.sub}}" aria-label="7-Zip 안에"></span>
+            <span style="text-align: center"><input type="radio" name="{{it.key}}" checked="{{it.sub}}" aria-label="j-zip 안에"></span>
             <span style="text-align: center"><input type="radio" name="{{it.key}}" checked="{{it.off}}" aria-label="숨김"></span>
           </div>
         </sc-for>
@@ -76,7 +76,7 @@ class Component extends DCLogic {
   renderVals() {
     const navRaw = [
       { name: '일반' },
-      { name: '압축 풀기', tag: '#30 #31' },
+      { name: '압축 풀기', tag: '#13 #17 #30 #31 #32' },
       { name: '압축' },
       { name: '탐색기 메뉴', on: true },
       { name: '연결 프로그램' },
@@ -88,7 +88,7 @@ class Component extends DCLogic {
       bg: n.on ? '#E8F0FE' : 'transparent', color: n.on ? '#174EA6' : '#1B1F24', weight: n.on ? '700' : '400'
     }));
     const raw = [
-      ['여기에 풀기 (스마트)', 'top'], ['"폴더명\\"에 풀기', 'top'], ['다른 위치에 풀기…', 'sub'],
+      ['여기에 풀기 (스마트)', 'top'], ['"{이름}\\"에 풀기', 'top'], ['다른 위치에 풀기…', 'sub'],
       ['"이름.zip"으로 압축', 'top'], ['"이름.7z"로 압축', 'sub'], ['압축 파일 테스트', 'sub'], ['해시 값 계산', 'off']
     ];
     const items = raw.map(([name, pos], i) => ({
