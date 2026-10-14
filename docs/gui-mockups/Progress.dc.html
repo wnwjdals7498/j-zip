@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>진행 창과 완료 알림</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F6FEB}a:hover{color:#174EA6}
+.tag{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:9px;background:#B4235A;color:#FFFFFF;font-size:11px;font-weight:700;line-height:18px;margin-left:6px}
+</style>
+</helmet>
+<div style="width: 560px; height: 480px; box-sizing: border-box; padding: 20px; display: flex; flex-direction: column; gap: 24px; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; color: #1B1F24; background: #E9ECEF">
+
+  <div style="background: #FFFFFF; border: 1px solid #D8DCE1; border-radius: 8px; overflow: hidden">
+    <div style="display: flex; align-items: center; height: 38px; padding: 0 14px; background: #F5F6F8; border-bottom: 1px solid #D8DCE1; font-weight: 500">
+      압축 푸는 중 — 사진_2026.zip
+      <div style="flex: 1"></div>
+      <span style="color: #57606A">62%</span>
+    </div>
+    <div style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+      <div style="height: 10px; border-radius: 5px; background: #E3E6EA; overflow: hidden">
+        <div style="width: 62%; height: 100%; background: #1F6FEB; border-radius: 5px"></div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; font-size: 12px">
+        <div style="display: flex; flex-direction: column; gap: 2px"><span style="color: #57606A">처리함</span><span style="font-weight: 500">770 MB / 1.24 GB</span></div>
+        <div style="display: flex; flex-direction: column; gap: 2px"><span style="color: #57606A">속도</span><span style="font-weight: 500">112 MB/s</span></div>
+        <div style="display: flex; flex-direction: column; gap: 2px"><span style="color: #57606A">남은 시간</span><span style="font-weight: 500">약 4초</span></div>
+        <div style="display: flex; flex-direction: column; gap: 2px"><span style="color: #57606A">파일</span><span style="font-weight: 500">79 / 128</span></div>
+      </div>
+      <div style="font-size: 12px; color: #57606A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">여행\제주\성산일출봉.mp4</div>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap">
+        <label style="display: flex; align-items: center; gap: 6px"><input type="checkbox" checked>끝나면 폴더 열기</label>
+        <label style="display: flex; align-items: center; gap: 6px"><input type="checkbox" checked>끝나면 이 창 닫기<span class="tag">#32</span></label>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center">
+        <span style="font-size: 12px; color: #57606A">대기 1개: backup_0901.7z</span>
+        <div style="flex: 1"></div>
+        <button style="height: 32px; padding: 0 12px; border: 1px solid #D8DCE1; border-radius: 6px; background: #FFFFFF; font: inherit">백그라운드로</button>
+        <button style="height: 32px; padding: 0 12px; border: 1px solid #D8DCE1; border-radius: 6px; background: #FFFFFF; font: inherit">일시정지</button>
+        <button style="height: 32px; padding: 0 12px; border: 1px solid #D8DCE1; border-radius: 6px; background: #FFFFFF; font: inherit">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 6px">
+    <span style="font-size: 12px; color: #57606A; display: flex; align-items: center">창을 닫으면 끝날 때 Windows 알림으로 알려줌<span class="tag">#32</span><span class="tag">#30</span></span>
+    <div style="align-self: flex-end; width: 360px; padding: 14px 16px; border-radius: 8px; background: #FFFFFF; border: 1px solid #D8DCE1; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; gap: 8px">
+        <span style="display: inline-flex; width: 20px; height: 20px; border-radius: 10px; background: #1A7F37; align-items: center; justify-content: center">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4 4 10-10"/></svg>
+        </span>
+        <span style="font-weight: 700">압축 풀기 완료</span>
+        <div style="flex: 1"></div>
+        <span style="color: #57606A; font-size: 12px">방금</span>
+      </div>
+      <span style="color: #57606A">사진_2026 · 파일 128개 · 1.24 GB · 11초</span>
+      <div style="display: flex; gap: 8px">
+        <button style="flex: 1; height: 32px; border: 0; border-radius: 6px; background: #1F6FEB; color: #FFFFFF; font: inherit">폴더 열기</button>
+        <button style="flex: 1; height: 32px; border: 1px solid #D8DCE1; border-radius: 6px; background: #FFFFFF; font: inherit">압축 파일 휴지통으로</button>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":560,"height":480}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

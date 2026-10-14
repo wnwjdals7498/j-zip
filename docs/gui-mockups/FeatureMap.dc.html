@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>기능과 화면 매핑</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F6FEB}a:hover{color:#174EA6}
+</style>
+</helmet>
+<div style="width: 960px; height: 1000px; box-sizing: border-box; padding: 40px 40px 32px; background: #FFFFFF; font-family: 'Noto Sans KR', sans-serif; color: #1B1F24; display: flex; flex-direction: column; gap: 20px">
+  <div style="display: flex; flex-direction: column; gap: 6px">
+    <h1 style="margin: 0; font-size: 28px; font-weight: 700">기능 → 화면 매핑</h1>
+    <p style="margin: 0; color: #57606A; font-size: 14px">번호는 앞서 정리한 반디집 대비 기능 목록(#1–#36)과 같음. 화면 안의 분홍 배지가 해당 번호.</p>
+  </div>
+  <div style="display: flex; gap: 16px; font-size: 12px; color: #57606A; flex-wrap: wrap">
+    <span style="display: flex; align-items: center; gap: 6px"><span style="padding: 1px 8px; border-radius: 9px; background: #DAF0E1; color: #145C2B; font-weight: 700">있음</span>7-Zip에 이미 있음</span>
+    <span style="display: flex; align-items: center; gap: 6px"><span style="padding: 1px 8px; border-radius: 9px; background: #FBEFD0; color: #7A4F00; font-weight: 700">일부</span>있지만 불편</span>
+    <span style="display: flex; align-items: center; gap: 6px"><span style="padding: 1px 8px; border-radius: 9px; background: #FBE1E3; color: #9F1C26; font-weight: 700">없음</span>새로 만들어야 함</span>
+    <span>· P1 쉬움·효과 큼 · P2 중간 · P3 후순위</span>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; flex: 1">
+    <sc-for list="{{cols}}" as="col" hint-placeholder-count="2">
+      <div style="display: flex; flex-direction: column">
+        <div style="display: grid; grid-template-columns: 34px 1fr 64px 44px 36px; gap: 8px; padding: 6px 4px; border-bottom: 2px solid #1B1F24; font-size: 12px; font-weight: 700">
+          <span>#</span><span>기능</span><span>화면</span><span>7-Zip</span><span>순위</span>
+        </div>
+        <sc-for list="{{col.rows}}" as="r" hint-placeholder-count="18">
+          <div style="display: grid; grid-template-columns: 34px 1fr 64px 44px 36px; gap: 8px; align-items: center; padding: 6px 4px; border-bottom: 1px solid #E3E6EA; font-size: 13px">
+            <span style="color: #B4235A; font-weight: 700">{{r.n}}</span>
+            <span>{{r.name}}</span>
+            <span style="color: #57606A; font-size: 12px">{{r.screen}}</span>
+            <span style="padding: 1px 0; border-radius: 9px; text-align: center; font-size: 11px; font-weight: 700; background: {{r.sbg}}; color: {{r.sfg}}">{{r.status}}</span>
+            <span style="font-size: 12px; font-weight: 700; color: {{r.pcol}}">{{r.p}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":960,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const S = { ok: ['있음', '#DAF0E1', '#145C2B'], part: ['일부', '#FBEFD0', '#7A4F00'], no: ['없음', '#FBE1E3', '#9F1C26'] };
+    const P = { P1: '#1F6FEB', P2: '#57606A', P3: '#8C959F', '제외': '#8C959F', '—': '#8C959F' };
+    const data = [
+      [1, '분할 압축', 'S3', 'ok', '—'], [2, '4GB 넘는 아카이브', 'S3', 'ok', '—'],
+      [3, '멀티코어 압축', 'S3', 'ok', '—'], [4, 'AES-256 암호', 'S3 S6', 'ok', '—'],
+      [5, 'ZIPX/LZH/ISO 만들기', 'S3', 'part', 'P3'], [6, '자동 해제 EXE', 'S3', 'part', 'P3'],
+      [7, 'ALZ/EGG 해제', 'S1 S2', 'no', 'P2'], [8, 'ZSTD/LZ4 해제', 'S1', 'part', 'P3'],
+      [9, 'ACE 해제', '—', 'no', '제외'], [10, '풀지 않고 목록 보기', 'S1', 'ok', '—'],
+      [11, '드래그해서 꺼내기', 'S1', 'part', 'P2'], [12, 'TGZ/TBZ 한 번에 풀기', 'S2', 'no', 'P1'],
+      [13, '스마트 해제', 'S2 S7', 'part', 'P1'], [14, '풀지 않고 수정', 'S1', 'ok', '—'],
+      [15, '안의 파일 바로 편집', 'S1', 'part', 'P2'], [16, '주석 보기', 'S1', 'part', 'P3'],
+      [17, '파일명 인코딩 자동 감지', 'S1 S5', 'no', 'P1'], [18, '우클릭 메뉴', 'S7', 'ok', '—'],
+      [19, 'Win11 새 메뉴', 'S7', 'no', 'P2'], [20, '무결성 테스트', 'S1 S9', 'ok', '—'],
+      [21, '악성코드 검사', 'S8 S9', 'no', 'P3'], [22, '다국어', 'S8', 'ok', '—'],
+      [23, '비밀번호 관리자', 'S6', 'no', 'P2'], [24, '손상 ZIP 복구', 'S9', 'no', 'P3'],
+      [25, '비밀번호 찾기', '—', 'no', '제외'], [26, '이미지 썸네일', 'S1', 'no', 'P2'],
+      [27, 'ARM64/포터블/스토어', '배포', 'part', 'P3'], [28, '다크모드', 'S1 S8', 'no', 'P2'],
+      [29, '고DPI·모던 아이콘', '전체', 'no', 'P2'], [30, '해제 후 폴더 열기', 'S2 S4', 'no', 'P1'],
+      [31, '해제 후 원본 휴지통', 'S2 S8', 'no', 'P1'], [32, '자동 닫기·완료 알림', 'S4', 'part', 'P1'],
+      [33, '분할 파일 자동 인식', 'S1 S9', 'part', 'P2'], [34, '메뉴 항목 고르기', 'S8', 'ok', 'P3'],
+      [35, '여러 개 각각 풀기', 'S7', 'part', 'P2'], [36, '탭 탐색기', 'S1', 'no', 'P3']
+    ];
+    const rows = data.map(([n, name, screen, st, p]) => ({
+      n: '#' + n, name, screen, status: S[st][0], sbg: S[st][1], sfg: S[st][2], p, pcol: P[p]
+    }));
+    return { cols: [{ rows: rows.slice(0, 18) }, { rows: rows.slice(18) }] };
+  }
+}
+</script>
+</body>
+</html>

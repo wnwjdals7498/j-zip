@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>메인 탐색 창</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F6FEB}a:hover{color:#174EA6}
+.tag{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:9px;background:#B4235A;color:#FFFFFF;font-size:11px;font-weight:700;line-height:18px;margin-left:6px}
+.tb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:64px;height:56px;padding:0 8px;border:0;border-radius:6px;background:transparent;font:inherit;font-size:12px;cursor:pointer}
+.ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.sm{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+</style>
+</helmet>
+<div style="width: 1200px; height: 760px; box-sizing: border-box; display: flex; flex-direction: column; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; color: {{c.text}}; background: {{c.bg}}; border: 1px solid {{c.border}}; border-radius: 8px; overflow: hidden">
+
+  <div style="display: flex; align-items: flex-end; gap: 2px; height: 40px; padding: 0 12px; background: {{c.chrome}}">
+    <div style="display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; background: {{c.bg}}; border-radius: 8px 8px 0 0; font-weight: 500">
+      <svg class="sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v13H4z M4 7l2-3h12l2 3 M10 11h4"/></svg>
+      사진_2026.zip
+      <span style="color: {{c.muted}}">×</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; color: {{c.muted}}">
+      <svg class="sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v13H4z M4 7l2-3h12l2 3 M10 11h4"/></svg>
+      backup_0901.7z
+    </div>
+    <button aria-label="새 탭" style="width: 32px; height: 32px; border: 0; background: transparent; color: {{c.muted}}; font-size: 18px">+</button>
+    <sc-if value="{{showTags}}" hint-placeholder-val="{{ true }}"><span class="tag" style="margin-bottom: 8px">#36 탭</span></sc-if>
+    <div style="flex: 1"></div>
+    <div style="display: flex; gap: 20px; height: 32px; align-items: center; color: {{c.muted}}; font-size: 14px" aria-hidden="true"><span>—</span><span>☐</span><span>✕</span></div>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 4px; padding: 6px 12px; background: {{c.bg}}; border-bottom: 1px solid {{c.border}}">
+    <button class="tb" style="background: {{c.accent}}; color: #FFFFFF; min-width: 84px">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v13H4z M4 7l2-3h12l2 3 M12 10v7 M9 14l3 3 3-3"/></svg>
+      압축 풀기 ▾
+    </button>
+    <button class="tb" style="color: {{c.text}}">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v13H4z M4 7l2-3h12l2 3 M12 10v7 M8.5 13.5h7"/></svg>
+      새로 압축
+    </button>
+    <button class="tb" style="color: {{c.text}}">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4 M12 11v6 M9 14h6"/></svg>
+      파일 추가
+    </button>
+    <button class="tb" style="color: {{c.text}}">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14 M9 7V4h6v3 M7 7l1 13h8l1-13"/></svg>
+      삭제
+    </button>
+    <div style="width: 1px; height: 40px; background: {{c.border}}; margin: 0 6px"></div>
+    <button class="tb" style="color: {{c.text}}">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z M9 12l2 2 4-4"/></svg>
+      테스트
+    </button>
+    <button class="tb" style="color: {{c.text}}">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z M4 10h16 M10 10v9"/></svg>
+      보기 ▾
+    </button>
+    <div style="flex: 1"></div>
+    <label style="display: flex; align-items: center; gap: 8px; width: 240px; height: 34px; padding: 0 10px; box-sizing: border-box; border: 1px solid {{c.border}}; border-radius: 6px; background: {{c.surface}}; color: {{c.muted}}">
+      <svg class="sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>
+      <input placeholder="압축 파일 안에서 검색" style="border: 0; outline: 0; background: transparent; font: inherit; color: {{c.text}}; width: 100%">
+    </label>
+    <button aria-label="설정" style="width: 40px; height: 40px; border: 0; background: transparent; color: {{c.text}}">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3 M12 19v3 M2 12h3 M19 12h3 M5 5l2 2 M17 17l2 2 M5 19l2-2 M17 7l2-2"/></svg>
+    </button>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid {{c.border}}; background: {{c.bg}}">
+    <button aria-label="뒤로" style="width: 30px; height: 30px; border: 0; border-radius: 4px; background: transparent; color: {{c.muted}}"><svg class="sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <button aria-label="상위 폴더" style="width: 30px; height: 30px; border: 0; border-radius: 4px; background: transparent; color: {{c.muted}}"><svg class="sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5 M6 11l6-6 6 6"/></svg></button>
+    <div style="flex: 1; display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border: 1px solid {{c.border}}; border-radius: 6px; background: {{c.surface}}">
+      <span>사진_2026.zip</span><span style="color: {{c.muted}}">›</span><span>여행</span><span style="color: {{c.muted}}">›</span><span style="font-weight: 500">제주</span>
+    </div>
+    <button style="display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border: 1px solid {{c.accent}}; border-radius: 15px; background: {{c.accentSoft}}; color: {{c.accentText}}; font: inherit; font-size: 12px">
+      파일명: 한국어 CP949 (자동 감지) ▾
+    </button>
+    <sc-if value="{{showTags}}" hint-placeholder-val="{{ true }}"><span class="tag">#17</span></sc-if>
+  </div>
+
+  <div style="flex: 1; display: flex; min-height: 0">
+    <div style="width: 210px; padding: 10px 8px; box-sizing: border-box; border-right: 1px solid {{c.border}}; background: {{c.bg}}; display: flex; flex-direction: column; gap: 2px">
+      <div style="display: flex; align-items: center; gap: 6px; padding: 6px 8px; font-weight: 500">
+        <svg class="sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v13H4z M4 7l2-3h12l2 3"/></svg>사진_2026.zip
+      </div>
+      <sc-for list="{{tree}}" as="t" hint-placeholder-count="5">
+        <div style="display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 4px; padding-left: {{t.indent}}; background: {{t.bg}}; color: {{t.color}}">
+          <svg class="sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h6l2 2h10v11H3z"/></svg>{{t.name}}
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; background: {{c.surface}}">
+      <div style="display: grid; grid-template-columns: 1fr 90px 90px 140px 80px; gap: 8px; padding: 8px 14px; border-bottom: 1px solid {{c.border}}; color: {{c.muted}}; font-size: 12px">
+        <span>이름 ▴</span><span style="text-align: right">크기</span><span style="text-align: right">압축 크기</span><span>수정한 날짜</span><span>형식</span>
+      </div>
+      <sc-for list="{{files}}" as="f" hint-placeholder-count="8">
+        <div style="display: grid; grid-template-columns: 1fr 90px 90px 140px 80px; gap: 8px; align-items: center; padding: 7px 14px; background: {{f.bg}}; border-left: 3px solid {{f.edge}}">
+          <span style="display: flex; align-items: center; gap: 8px; min-width: 0">
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 20px; border-radius: 4px; font-size: 9px; font-weight: 700; color: #FFFFFF; background: {{f.tint}}">{{f.ext}}</span>
+            <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{f.name}}</span>
+            <sc-if value="{{f.locked}}" hint-placeholder-val="{{ false }}"><svg class="sm" viewBox="0 0 24 24" role="img" aria-label="암호화됨" style="color: {{c.muted}}"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></sc-if>
+          </span>
+          <span style="text-align: right">{{f.size}}</span>
+          <span style="text-align: right; color: {{c.muted}}">{{f.packed}}</span>
+          <span style="color: {{c.muted}}">{{f.date}}</span>
+          <span style="color: {{c.muted}}">{{f.kind}}</span>
+        </div>
+      </sc-for>
+      <div style="flex: 1"></div>
+      <div style="margin: 12px 14px; padding: 10px 12px; border: 1px dashed {{c.border}}; border-radius: 6px; color: {{c.muted}}; font-size: 12px; text-align: center">
+        여기로 끌어 놓으면 이 압축 파일에 추가 · 목록에서 탐색기로 끌어내면 바로 풀기
+        <sc-if value="{{showTags}}" hint-placeholder-val="{{ true }}"><span class="tag">#11</span></sc-if>
+      </div>
+    </div>
+
+    <div style="width: 290px; box-sizing: border-box; padding: 14px; border-left: 1px solid {{c.border}}; background: {{c.bg}}; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; align-items: center; font-weight: 700">미리보기<sc-if value="{{showTags}}" hint-placeholder-val="{{ true }}"><span class="tag">#26</span></sc-if></div>
+      <div style="height: 170px; border-radius: 6px; background: {{c.thumb}}; display: flex; align-items: center; justify-content: center; color: {{c.muted}}; font-size: 12px">[이미지 썸네일 · IMG_0412.jpg]</div>
+      <div style="display: grid; grid-template-columns: 76px 1fr; row-gap: 6px; font-size: 12px">
+        <span style="color: {{c.muted}}">크기</span><span>4.8 MB (압축 4.6 MB)</span>
+        <span style="color: {{c.muted}}">해상도</span><span>4032 × 3024</span>
+        <span style="color: {{c.muted}}">수정</span><span>2026-08-03 14:22</span>
+        <span style="color: {{c.muted}}">CRC32</span><span>9A1F03C2</span>
+      </div>
+      <div style="height: 1px; background: {{c.border}}"></div>
+      <div style="display: flex; align-items: center; font-weight: 700">압축 파일 주석<sc-if value="{{showTags}}" hint-placeholder-val="{{ true }}"><span class="tag">#16</span></sc-if></div>
+      <div style="padding: 8px 10px; border-radius: 6px; background: {{c.surface}}; border: 1px solid {{c.border}}; font-size: 12px; color: {{c.muted}}; white-space: pre-line">[ZIP 주석이 여기 표시됨]</div>
+      <div style="flex: 1"></div>
+      <button style="height: 36px; border: 0; border-radius: 6px; background: {{c.accent}}; color: #FFFFFF; font: inherit; font-weight: 500">선택한 2개 풀기…</button>
+      <button style="height: 36px; border: 1px solid {{c.border}}; border-radius: 6px; background: {{c.surface}}; color: {{c.text}}; font: inherit">기본 앱으로 열기 (편집하면 자동 갱신)<sc-if value="{{showTags}}" hint-placeholder-val="{{ true }}"><span class="tag">#15</span></sc-if></button>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 16px; height: 30px; padding: 0 14px; border-top: 1px solid {{c.border}}; background: {{c.chrome}}; color: {{c.muted}}; font-size: 12px">
+    <span>파일 128개 · 폴더 6개</span>
+    <span>1.24 GB → 980 MB (79%)</span>
+    <span>ZIP · Deflate</span>
+    <span style="display: flex; align-items: center; gap: 4px"><svg class="sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>AES-256</span>
+    <span>분할 3개 (.z01–.zip) 모두 찾음</span>
+    <sc-if value="{{showTags}}" hint-placeholder-val="{{ true }}"><span class="tag">#33</span></sc-if>
+    <div style="flex: 1"></div>
+    <span>2개 선택 · 9.1 MB</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"showTags":{"editor":"boolean","default":true},"$preview":{"width":1200,"height":760}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const dark = this.props.dark ?? false;
+    const c = dark ? {
+      bg: '#1F2228', chrome: '#181B20', surface: '#262A31', border: '#3A3F48', text: '#E7E9EC', muted: '#A4ADB8',
+      accent: '#3B82F6', accentSoft: '#1E2C44', accentText: '#BFD5FF', sel: '#24364F', thumb: '#30353D'
+    } : {
+      bg: '#F5F6F8', chrome: '#E9ECEF', surface: '#FFFFFF', border: '#D8DCE1', text: '#1B1F24', muted: '#57606A',
+      accent: '#1F6FEB', accentSoft: '#E8F0FE', accentText: '#174EA6', sel: '#E1ECFD', thumb: '#E3E6EA'
+    };
+    const treeRaw = [
+      { name: '문서', depth: 1 }, { name: '여행', depth: 1 }, { name: '서울', depth: 2 },
+      { name: '제주', depth: 2, on: true }, { name: '가족', depth: 1 }
+    ];
+    const tree = treeRaw.map((t) => ({
+      name: t.name, indent: (8 + t.depth * 14) + 'px',
+      bg: t.on ? c.sel : 'transparent', color: t.on ? c.accentText : c.text
+    }));
+    const raw = [
+      { ext: 'DIR', name: '동영상', size: '', packed: '', date: '2026-08-04 10:12', kind: '폴더', tint: '#8A6D1F' },
+      { ext: 'JPG', name: 'IMG_0412.jpg', size: '4.8 MB', packed: '4.6 MB', date: '2026-08-03 14:22', kind: 'JPEG', tint: '#2F7D5B', on: true },
+      { ext: 'JPG', name: 'IMG_0413.jpg', size: '4.3 MB', packed: '4.1 MB', date: '2026-08-03 14:25', kind: 'JPEG', tint: '#2F7D5B', on: true },
+      { ext: 'PNG', name: '지도_캡처.png', size: '1.2 MB', packed: '1.1 MB', date: '2026-08-02 09:40', kind: 'PNG', tint: '#2F7D5B' },
+      { ext: 'PDF', name: '항공권_확인서.pdf', size: '312 KB', packed: '290 KB', date: '2026-07-28 18:03', kind: 'PDF', tint: '#B4232C', locked: true },
+      { ext: 'XLS', name: '여행경비.xlsx', size: '48 KB', packed: '21 KB', date: '2026-08-05 22:10', kind: 'Excel', tint: '#1D6F42' },
+      { ext: 'TXT', name: '메모.txt', size: '3 KB', packed: '1 KB', date: '2026-08-01 08:00', kind: '텍스트', tint: '#57606A' },
+      { ext: 'MP4', name: '성산일출봉.mp4', size: '412 MB', packed: '409 MB', date: '2026-08-03 06:11', kind: '동영상', tint: '#6B3FA0' }
+    ];
+    const files = raw.map((f) => ({
+      ...f, locked: !!f.locked,
+      bg: f.on ? c.sel : 'transparent', edge: f.on ? c.accent : 'transparent'
+    }));
+    return { c, tree, files, showTags: this.props.showTags ?? true };
+  }
+}
+</script>
+</body>
+</html>

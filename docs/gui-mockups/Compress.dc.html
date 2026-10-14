@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>새로 압축 대화상자</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F6FEB}a:hover{color:#174EA6}
+.tag{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:9px;background:#B4235A;color:#FFFFFF;font-size:11px;font-weight:700;line-height:18px;margin-left:6px}
+</style>
+</helmet>
+<div style="width: 720px; height: 760px; box-sizing: border-box; display: flex; flex-direction: column; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; color: #1B1F24; background: #FFFFFF; border: 1px solid #D8DCE1; border-radius: 8px; overflow: hidden">
+  <div style="display: flex; align-items: center; height: 40px; padding: 0 16px; background: #F5F6F8; border-bottom: 1px solid #D8DCE1; font-weight: 500">
+    새로 압축 — 항목 14개 (2.1 GB)
+    <div style="flex: 1"></div>
+    <div style="display: flex; padding: 2px; border-radius: 6px; background: #E3E6EA" role="group" aria-label="보기 방식">
+      <button onClick="{{ toSimple }}" style="height: 26px; padding: 0 12px; border: 0; border-radius: 4px; font: inherit; font-size: 12px; background: {{simpleBg}}; color: #1B1F24">간단</button>
+      <button onClick="{{ toAdv }}" style="height: 26px; padding: 0 12px; border: 0; border-radius: 4px; font: inherit; font-size: 12px; background: {{advBg}}; color: #1B1F24">고급</button>
+    </div>
+  </div>
+
+  <div style="flex: 1; padding: 18px 20px; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <label for="out" style="font-weight: 700">저장할 파일</label>
+      <div style="display: flex; gap: 8px">
+        <input id="out" value="D:\작업\프로젝트_자료.zip" style="flex: 1; height: 34px; padding: 0 10px; border: 1px solid #D8DCE1; border-radius: 6px; font: inherit">
+        <button style="height: 34px; padding: 0 14px; border: 1px solid #D8DCE1; border-radius: 6px; background: #FFFFFF; font: inherit">찾아보기…</button>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <span style="font-weight: 700; display: flex; align-items: center">형식<span class="tag">#5</span><span class="tag">#6</span></span>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+        <sc-for list="{{formats}}" as="f" hint-placeholder-count="4">
+          <button onClick="{{ f.pick }}" style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 12px; border-radius: 8px; font: inherit; text-align: left; border: {{f.border}}; background: {{f.bg}}">
+            <span style="font-weight: 700">{{f.name}}</span>
+            <span style="font-size: 12px; color: #57606A">{{f.desc}}</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 20px">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <span style="font-weight: 700">압축 수준</span>
+        <div style="display: flex; padding: 2px; border-radius: 6px; background: #E3E6EA">
+          <button style="flex: 1; height: 28px; border: 0; border-radius: 4px; background: transparent; font: inherit">저장만</button>
+          <button style="flex: 1; height: 28px; border: 0; border-radius: 4px; background: transparent; font: inherit">빠름</button>
+          <button style="flex: 1; height: 28px; border: 0; border-radius: 4px; background: #FFFFFF; font: inherit; font-weight: 500">보통</button>
+          <button style="flex: 1; height: 28px; border: 0; border-radius: 4px; background: transparent; font: inherit">최고</button>
+        </div>
+        <span style="font-size: 12px; color: #57606A">예상 크기 약 1.6 GB · 약 40초</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <label for="split" style="font-weight: 700; display: flex; align-items: center">나눠서 압축<span class="tag">#1</span></label>
+        <select id="split" style="height: 34px; border: 1px solid #D8DCE1; border-radius: 6px; font: inherit; padding: 0 8px">
+          <option>나누지 않음</option><option>메일 첨부용 (25 MB)</option><option>USB FAT32 (4 GB)</option><option>직접 입력…</option>
+        </select>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px; grid-column: 1 / -1">
+        <label for="pw" style="font-weight: 700; display: flex; align-items: center">암호<span class="tag">#4</span><span class="tag">#23</span></label>
+        <div style="display: flex; gap: 8px">
+          <input id="pw" type="password" value="password" style="flex: 1; height: 34px; padding: 0 10px; border: 1px solid #D8DCE1; border-radius: 6px; font: inherit">
+          <button style="height: 34px; padding: 0 12px; border: 1px solid #D8DCE1; border-radius: 6px; background: #FFFFFF; font: inherit">저장된 암호 ▾</button>
+        </div>
+        <label style="display: flex; align-items: center; gap: 8px"><input type="checkbox" checked>파일 이름도 숨기기 (7Z만 가능)</label>
+      </div>
+    </div>
+
+    <sc-if value="{{adv}}" hint-placeholder-val="{{ false }}">
+      <div style="padding: 14px; border: 1px solid #D8DCE1; border-radius: 8px; background: #F5F6F8; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 16px">
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #57606A">압축 방식
+          <select style="height: 30px; border: 1px solid #D8DCE1; border-radius: 4px; font: inherit; color: #1B1F24"><option>Deflate</option><option>Deflate64</option><option>LZMA</option></select></label>
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #57606A">사전 크기
+          <select style="height: 30px; border: 1px solid #D8DCE1; border-radius: 4px; font: inherit; color: #1B1F24"><option>32 KB</option></select></label>
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #57606A">CPU 스레드 (#3)
+          <select style="height: 30px; border: 1px solid #D8DCE1; border-radius: 4px; font: inherit; color: #1B1F24"><option>자동 (16 / 16)</option></select></label>
+        <label style="display: flex; align-items: center; gap: 6px"><input type="checkbox">솔리드 압축</label>
+        <label style="display: flex; align-items: center; gap: 6px"><input type="checkbox">압축 후 원본 삭제</label>
+        <label style="display: flex; align-items: center; gap: 6px"><input type="checkbox" checked>파일명 UTF-8 저장</label>
+      </div>
+    </sc-if>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: #F5F6F8; border-top: 1px solid #D8DCE1">
+    <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #57606A"><input type="checkbox">이 설정을 기본값으로</label>
+    <div style="flex: 1"></div>
+    <button style="height: 34px; padding: 0 18px; border: 1px solid #D8DCE1; border-radius: 6px; background: #FFFFFF; font: inherit">취소</button>
+    <button style="height: 34px; padding: 0 22px; border: 0; border-radius: 6px; background: #1F6FEB; color: #FFFFFF; font: inherit; font-weight: 500">압축</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":720,"height":760}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { adv: false, fmt: 'zip' };
+  }
+  renderVals() {
+    const list = [
+      { id: 'zip', name: 'ZIP', desc: '어디서나 열림' },
+      { id: '7z', name: '7Z', desc: '가장 작게' },
+      { id: 'exe', name: 'EXE', desc: '프로그램 없이 풀림' },
+      { id: 'tar', name: 'TAR.GZ', desc: '리눅스·서버용' }
+    ];
+    const formats = list.map((f) => {
+      const on = this.state.fmt === f.id;
+      return {
+        ...f,
+        border: on ? '2px solid #1F6FEB' : '1px solid #D8DCE1',
+        bg: on ? '#E8F0FE' : '#FFFFFF',
+        pick: () => this.setState({ fmt: f.id })
+      };
+    });
+    const adv = this.state.adv;
+    return {
+      formats,
+      adv,
+      simpleBg: adv ? 'transparent' : '#FFFFFF',
+      advBg: adv ? '#FFFFFF' : 'transparent',
+      toSimple: () => this.setState({ adv: false }),
+      toAdv: () => this.setState({ adv: true })
+    };
+  }
+}
+</script>
+</body>
+</html>

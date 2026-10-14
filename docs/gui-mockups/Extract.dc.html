@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>압축 풀기 대화상자</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F6FEB}a:hover{color:#174EA6}
+.tag{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:9px;background:#B4235A;color:#FFFFFF;font-size:11px;font-weight:700;line-height:18px;margin-left:6px}
+</style>
+</helmet>
+<div style="width: 640px; height: 580px; box-sizing: border-box; display: flex; flex-direction: column; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; color: #1B1F24; background: #FFFFFF; border: 1px solid #D8DCE1; border-radius: 8px; overflow: hidden">
+  <div style="display: flex; align-items: center; height: 40px; padding: 0 16px; background: #F5F6F8; border-bottom: 1px solid #D8DCE1; font-weight: 500">
+    압축 풀기 — 사진_2026.zip
+    <div style="flex: 1"></div>
+    <span style="color: #57606A" aria-hidden="true">✕</span>
+  </div>
+
+  <div style="flex: 1; padding: 18px 20px; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <label for="dest" style="font-weight: 700">풀 위치</label>
+      <div style="display: flex; gap: 8px">
+        <input id="dest" value="D:\Downloads\사진_2026" style="flex: 1; height: 34px; padding: 0 10px; border: 1px solid #1F6FEB; border-radius: 6px; font: inherit">
+        <button style="height: 34px; padding: 0 14px; border: 1px solid #D8DCE1; border-radius: 6px; background: #FFFFFF; font: inherit">찾아보기…</button>
+      </div>
+      <div style="display: flex; gap: 6px; flex-wrap: wrap">
+        <button style="height: 26px; padding: 0 10px; border: 1px solid #1F6FEB; border-radius: 13px; background: #E8F0FE; color: #174EA6; font: inherit; font-size: 12px">원본과 같은 위치</button>
+        <button style="height: 26px; padding: 0 10px; border: 1px solid #D8DCE1; border-radius: 13px; background: #FFFFFF; font: inherit; font-size: 12px">바탕 화면</button>
+        <button style="height: 26px; padding: 0 10px; border: 1px solid #D8DCE1; border-radius: 13px; background: #FFFFFF; font: inherit; font-size: 12px">최근: D:\작업\자료</button>
+        <button style="height: 26px; padding: 0 10px; border: 1px solid #D8DCE1; border-radius: 13px; background: #FFFFFF; font: inherit; font-size: 12px">최근: E:\백업</button>
+      </div>
+    </div>
+
+    <fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px">
+      <legend style="font-weight: 700; padding: 0; margin-bottom: 8px; display: flex; align-items: center">폴더 만들기<span class="tag">#13</span></legend>
+      <label style="display: flex; align-items: flex-start; gap: 8px"><input type="radio" name="mode" checked style="margin-top: 3px">
+        <span><b style="font-weight: 500">스마트</b> (권장) — 맨 위에 항목이 하나면 그대로, 여러 개면 "사진_2026" 폴더를 만들어서 풀기</span></label>
+      <label style="display: flex; align-items: center; gap: 8px"><input type="radio" name="mode">항상 압축 파일 이름으로 폴더 만들기</label>
+      <label style="display: flex; align-items: center; gap: 8px"><input type="radio" name="mode">폴더 없이 그대로 풀기</label>
+    </fieldset>
+
+    <div style="padding: 10px 12px; border-radius: 6px; background: #F5F6F8; font-size: 12px; display: flex; flex-direction: column; gap: 4px">
+      <span style="color: #57606A">결과 미리보기</span>
+      <span style="font-family: Consolas, monospace">D:\Downloads\사진_2026\ ← 맨 위 항목 5개를 묶음</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 20px">
+      <label style="display: flex; align-items: center; gap: 8px"><input type="checkbox" checked>끝나면 폴더 열기<span class="tag">#30</span></label>
+      <label style="display: flex; align-items: center; gap: 8px"><input type="checkbox">끝나면 압축 파일을 휴지통으로<span class="tag">#31</span></label>
+      <label style="display: flex; align-items: center; gap: 8px"><input type="checkbox" checked>.tar.gz 를 한 번에 풀기<span class="tag">#12</span></label>
+      <label style="display: flex; align-items: center; gap: 8px">같은 파일:
+        <select style="height: 28px; border: 1px solid #D8DCE1; border-radius: 4px; font: inherit"><option>매번 묻기</option><option>덮어쓰기</option><option>건너뛰기</option><option>이름 바꾸기</option></select>
+      </label>
+      <label style="display: flex; align-items: center; gap: 8px; grid-column: 1 / -1">파일명 인코딩:
+        <select style="height: 28px; border: 1px solid #D8DCE1; border-radius: 4px; font: inherit"><option>자동 (한국어 CP949 감지됨)</option><option>UTF-8</option><option>일본어 Shift-JIS</option></select>
+        <span class="tag">#17</span>
+      </label>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: #F5F6F8; border-top: 1px solid #D8DCE1">
+    <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #57606A"><input type="checkbox">다음부터 묻지 않고 이대로 풀기</label>
+    <div style="flex: 1"></div>
+    <button style="height: 34px; padding: 0 18px; border: 1px solid #D8DCE1; border-radius: 6px; background: #FFFFFF; font: inherit">취소</button>
+    <button style="height: 34px; padding: 0 22px; border: 0; border-radius: 6px; background: #1F6FEB; color: #FFFFFF; font: inherit; font-weight: 500">풀기</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":640,"height":580}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

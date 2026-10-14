@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>파일명 인코딩 선택</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F6FEB}a:hover{color:#174EA6}
+.tag{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:9px;background:#B4235A;color:#FFFFFF;font-size:11px;font-weight:700;line-height:18px;margin-left:6px}
+</style>
+</helmet>
+<div style="width: 640px; height: 500px; box-sizing: border-box; display: flex; flex-direction: column; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; color: #1B1F24; background: #FFFFFF; border: 1px solid #D8DCE1; border-radius: 8px; overflow: hidden">
+  <div style="display: flex; align-items: center; height: 40px; padding: 0 16px; background: #F5F6F8; border-bottom: 1px solid #D8DCE1; font-weight: 500">
+    파일명 인코딩 — 졸업작품_최종.zip<span class="tag">#17</span>
+    <div style="flex: 1"></div>
+    <span style="color: #57606A" aria-hidden="true">✕</span>
+  </div>
+  <div style="margin: 16px 20px 0; padding: 10px 12px; border-radius: 6px; background: #E8F0FE; color: #174EA6">
+    이 ZIP에는 파일명 인코딩 정보가 없음. 한국어(CP949)로 읽으면 가장 자연스러움.
+  </div>
+  <div style="flex: 1; display: flex; gap: 16px; padding: 16px 20px; min-height: 0">
+    <div style="width: 220px; display: flex; flex-direction: column; gap: 4px" role="radiogroup" aria-label="인코딩">
+      <sc-for list="{{encs}}" as="e" hint-placeholder-count="5">
+        <label style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 6px; background: {{e.bg}}; border: {{e.border}}">
+          <input type="radio" name="enc" checked="{{e.on}}">
+          <span style="flex: 1">{{e.name}}</span>
+          <span style="font-size: 11px; color: #57606A">{{e.score}}</span>
+        </label>
+      </sc-for>
+    </div>
+    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; border: 1px solid #D8DCE1; border-radius: 6px; overflow: hidden">
+      <div style="padding: 8px 12px; background: #F5F6F8; border-bottom: 1px solid #D8DCE1; font-size: 12px; color: #57606A">미리보기 — 한국어 (CP949)</div>
+      <sc-for list="{{names}}" as="n" hint-placeholder-count="6">
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 6px 12px; border-bottom: 1px solid #EEF0F2; font-size: 12px">
+          <span style="font-weight: 500">{{n.good}}</span>
+          <span style="color: #8C959F; font-family: Consolas, monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{n.bad}}</span>
+        </div>
+      </sc-for>
+      <div style="padding: 6px 12px; font-size: 11px; color: #57606A">왼쪽: 선택한 인코딩 · 오른쪽: 기존 7-Zip 표시</div>
+    </div>
+  </div>
+  <div style="display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: #F5F6F8; border-top: 1px solid #D8DCE1">
+    <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #57606A"><input type="checkbox" checked>인코딩 정보 없는 ZIP은 항상 자동 감지</label>
+    <div style="flex: 1"></div>
+    <button style="height: 34px; padding: 0 18px; border: 1px solid #D8DCE1; border-radius: 6px; background: #FFFFFF; font: inherit">취소</button>
+    <button style="height: 34px; padding: 0 22px; border: 0; border-radius: 6px; background: #1F6FEB; color: #FFFFFF; font: inherit; font-weight: 500">적용</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":640,"height":500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const list = [
+      { name: '한국어 (CP949)', score: '추천 98%', on: true },
+      { name: 'UTF-8', score: '12%' },
+      { name: '일본어 (Shift-JIS)', score: '9%' },
+      { name: '중국어 간체 (GBK)', score: '7%' },
+      { name: '서유럽 (CP437)', score: '기본값' }
+    ];
+    const encs = list.map((e) => ({
+      ...e, on: !!e.on,
+      bg: e.on ? '#E8F0FE' : '#FFFFFF',
+      border: e.on ? '1px solid #1F6FEB' : '1px solid transparent'
+    }));
+    const names = [
+      { good: '발표자료_최종.pptx', bad: '¹ßÇ¥ÀÚ·á_ÃÖÁ¾.pptx' },
+      { good: '보고서/1장_서론.hwp', bad: 'º¸°í¼­/1Àå_¼­·Ð.hwp' },
+      { good: '보고서/2장_본론.hwp', bad: 'º¸°í¼­/2Àå_º»·Ð.hwp' },
+      { good: '참고문헌.docx', bad: 'Âü°í¹®Çå.docx' },
+      { good: '시연영상.mp4', bad: '½Ã¿¬¿µ»ó.mp4' },
+      { good: '소스코드/main.c', bad: '¼Ò½ºÄÚµå/main.c' }
+    ];
+    return { encs, names };
+  }
+}
+</script>
+</body>
+</html>
