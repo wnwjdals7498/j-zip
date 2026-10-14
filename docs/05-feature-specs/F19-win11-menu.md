@@ -30,16 +30,18 @@ j-zip은 MSIX 전체 패키지(full package)로 설치되어 패키지 ID를 갖
 
 ## 3. 요구사항
 
-- FR-19-1 j-zip MSIX(전체 패키지)는 `jzip-shell.dll`을 매니페스트의 `windows.comServer`(`SurrogateServer`, STA)로 선언해, 셸 확장이 j-zip 패키지 ID로 등록되게 한다. sparse package(외부 위치 패키지)와 별도 설치기는 쓰지 않는다.
-- FR-19-2 같은 매니페스트의 `desktop4:FileExplorerContextMenus`(`windows.fileExplorerContextMenus`)로 j-zip `IExplorerCommand` CLSID를 파일(`*`)과 폴더(`Directory`) 대상으로 선언한다.
-- FR-19-3 패키지는 서명되어야 한다(07 문서 6절). 등록은 MSIX 설치가 처리하며, `JZip.exe`가 셸 확장 등록을 확인할 수 없으면 S8-18로 안내한다.
-- FR-19-4 Win11 최상위에는 S8-05에서 "맨 위에"로 지정된 항목만 직접 보이고, 나머지는 "j-zip ▸"(S7-03) 하위 명령(`EnumSubCommands`)으로 보인다.
-- FR-19-5 기본 최상위 항목: 아카이브 1개 = S7-01 "여기에 풀기 (스마트)", S7-02 "\"{이름}\\\"에 풀기", S7-03. 여러 개 = S7-10. 일반 파일·폴더 = S7-11.
-- FR-19-6 각 명령의 `GetState`는 선택 항목 종류에 따라 표시/숨김을 정한다(아카이브가 아니면 풀기 숨김). 판별은 확장자 기준으로 빠르게 하고 파일 내용을 읽지 않는다.
-- FR-19-7 `Invoke`는 예전 메뉴와 같은 `JZip.exe` 명령(`--extract …`, `--compress …`, 테스트 — 현재 7zG가 하던 역할)을 실행한다. 같은 동작에 대해 예전 메뉴와 새 메뉴의 결과가 같아야 한다.
-- FR-19-8 S8-04에서 "예전 메뉴만"을 고르면 새 메뉴 항목은 모두 숨김(`ECS_HIDDEN`)이 되고 예전 메뉴는 그대로 유지된다. 패키지 등록 자체는 해제하지 않는다.
-- FR-19-9 Windows 10(2004 이상)에는 새 메뉴가 없으므로 예전 메뉴(S7-12)만 쓴다. S8-04는 비활성으로 "Windows 11 이상에서만 사용"을 표시하고 S8-18로 안내한다. MSIX로 등록한 항목이 Windows 10 예전 메뉴와 Win11 "추가 옵션 표시"에 어떻게 보이는지는 시제품 SP-1에서 확인한다(9절).
-- FR-19-10 j-zip을 제거하면 매니페스트로 선언한 COM 서버·셸 메뉴 등록이 패키지와 함께 지워진다. j-zip은 레지스트리에 별도 CLSID·`shellex` 키를 쓰지 않는다.
+단계([09](../09-development-process.md) 3.3): MSIX 셸 등록과 메뉴 동작은 **G3**, S8 화면과 메뉴 방식 설정은 **G4**다. 각 FR 끝에 단계를 적는다. S8이 생기기 전(G3)에는 설정 기본값으로 동작한다.
+
+- FR-19-1 j-zip MSIX(전체 패키지)는 `jzip-shell.dll`을 매니페스트의 `windows.comServer`(`SurrogateServer`, STA)로 선언해, 셸 확장이 j-zip 패키지 ID로 등록되게 한다. sparse package(외부 위치 패키지)와 별도 설치기는 쓰지 않는다. (G3)
+- FR-19-2 같은 매니페스트의 `desktop4:FileExplorerContextMenus`(`windows.fileExplorerContextMenus`)로 j-zip `IExplorerCommand` CLSID를 파일(`*`)과 폴더(`Directory`) 대상으로 선언한다. (G3)
+- FR-19-3 패키지는 서명되어야 한다(07 문서 6절). 등록은 MSIX 설치가 처리하며, `JZip.exe`가 셸 확장 등록을 확인할 수 없으면 S8-18로 안내한다. (G3. S8-18 안내는 G4)
+- FR-19-4 Win11 최상위에는 S8-05에서 "맨 위에"로 지정된 항목만 직접 보이고, 나머지는 "j-zip ▸"(S7-03) 하위 명령(`EnumSubCommands`)으로 보인다. (G3)
+- FR-19-5 기본 최상위 항목: 아카이브 1개 = S7-01 "여기에 풀기 (스마트)", S7-02 "\"{이름}\\\"에 풀기", S7-03. 여러 개 = S7-10. 일반 파일·폴더 = S7-11. (G3)
+- FR-19-6 각 명령의 `GetState`는 선택 항목 종류에 따라 표시/숨김을 정한다(아카이브가 아니면 풀기 숨김). 판별은 확장자 기준으로 빠르게 하고 파일 내용을 읽지 않는다. (G3)
+- FR-19-7 `Invoke`는 예전 메뉴와 같은 `JZip.exe` 명령([08. 아키텍처](../08-architecture.md) 5절 `--proto 1 --op extract …`, `--op compress …`, `--op test …` — 현재 7zG가 하던 역할)을 실행한다. 같은 동작에 대해 예전 메뉴와 새 메뉴의 결과가 같아야 한다. (G3)
+- FR-19-8 S8-04에서 "예전 메뉴만"을 고르면 새 메뉴 항목은 모두 숨김(`ECS_HIDDEN`)이 되고 예전 메뉴는 그대로 유지된다. 패키지 등록 자체는 해제하지 않는다. (G4)
+- FR-19-9 Windows 10(22H2 이상)에는 새 메뉴가 없으므로 예전 메뉴(S7-12)만 쓴다. S8-04는 비활성으로 "Windows 11 이상에서만 사용"을 표시하고 S8-18로 안내한다. MSIX로 등록한 항목이 Windows 10 예전 메뉴와 Win11 "추가 옵션 표시"에 어떻게 보이는지는 시제품 SP-1에서 확인한다(9절). (G3. S8-04 비활성 표시와 S8-18 안내는 G4)
+- FR-19-10 j-zip을 제거하면 매니페스트로 선언한 COM 서버·셸 메뉴 등록이 패키지와 함께 지워진다. j-zip은 레지스트리에 별도 CLSID·`shellex` 키를 쓰지 않는다. (G3)
 
 ## 4. GUI 명세
 
@@ -84,7 +86,7 @@ j-zip은 MSIX 전체 패키지(full package)로 설치되어 패키지 ID를 갖
 - [ ] `report.docx` 우클릭 시 "report.zip으로 압축"이 첫 메뉴에 보이고 풀기 항목은 없다.
 - [ ] 새 메뉴의 "여기에 풀기 (스마트)" 결과와 "추가 옵션 표시" 안 같은 항목의 결과가 같다(F13 수용 기준 샘플 사용).
 - [ ] S8-04를 "예전 메뉴만"으로 바꾸면 다음 우클릭부터 첫 메뉴에 j-zip 항목이 없고 "추가 옵션 표시" 안에는 있다.
-- [ ] Windows 10 2004 이상에서는 S8-04가 비활성이고, 우클릭 메뉴에 j-zip 항목이 보인다(SP-1 결과에 따라 등록 방식 확정).
+- [ ] Windows 10 22H2에서는 S8-04가 비활성이고, 우클릭 메뉴에 j-zip 항목이 보인다(SP-1 결과에 따라 등록 방식 확정).
 - [ ] 제거 후 `Get-AppxPackage`에 j-zip 패키지가 없고 우클릭 메뉴에도 j-zip 항목이 없다.
 - [ ] 7-Zip 26.04와 함께 설치해도 두 프로그램의 메뉴가 각각 동작한다.
 
@@ -92,7 +94,7 @@ j-zip은 MSIX 전체 패키지(full package)로 설치되어 패키지 ID를 갖
 
 - 범위 밖: Microsoft Store 배포 자체(#27), 아이콘 디자인(#29).
 - 해결: 서명 방식은 07 문서 6절을 따른다(사이드로드 = Azure Trusted Signing 등 공개 CA, Store = Microsoft 재서명, 개발용 = 자체 서명 인증서를 "신뢰할 수 있는 사람"에 등록). 발급 조건·비용은 SP-6에서 확인한다.
-- 선행 검증(SP-1, 07 문서 9절): WinUI 3 MSIX에 `jzip-shell.dll`을 `windows.fileExplorerContextMenus`로 등록해 Win11 새 메뉴에 보이는지, Windows 10 2004와 Win11 "추가 옵션 표시"(예전 메뉴)에서 어떻게 보이는지 확인한다. 예전 메뉴에 보이지 않으면 예전 메뉴용 `IContextMenu` 등록 방식을 따로 검토한다.
+- 선행 검증(SP-1, 07 문서 9절): WinUI 3 MSIX에 `jzip-shell.dll`을 `windows.fileExplorerContextMenus`로 등록해 Win11 새 메뉴에 보이는지, Windows 10 22H2와 Win11 "추가 옵션 표시"(예전 메뉴)에서 어떻게 보이는지 확인한다. 예전 메뉴에 보이지 않으면 예전 메뉴용 `IContextMenu` 등록 방식을 따로 검토한다.
 - 미결: 기존 `IExplorerCommand` 구현이 "최상위 항목 여러 개 + 하위 메뉴 하나" 구성을 그대로 낼 수 있는지. research 자료에는 `ECF_HASSUBCOMMANDS` 단일 루트 구성만 확인됐다. 최상위 항목마다 별도 CLSID가 필요할 수 있다.
 - 미결: Win11 셸이 서드파티 최상위 항목의 표시 순서·개수를 어떻게 정하는지는 research 자료 범위 밖이다.
 - 해결: NanaZip(03 문서 **N**)은 풀 MSIX + `comServer` + `FileExplorerContextMenus` 방식이다. j-zip은 이 패키징·등록 방식만 참고하고 UI 코드(Mile.Xaml)와 로고·아이콘(CC BY-ND)은 쓰지 않는다(07 문서 3절).

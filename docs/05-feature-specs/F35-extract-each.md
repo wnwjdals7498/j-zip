@@ -54,7 +54,8 @@
 
 ## 7. 구현 지점
 
-- #13과 같음: `jzip-core`(`CPP/7zip/UI/Common/Extract.cpp` `DecompressArchive`), `jzip-shell.dll`(`CPP/7zip/UI/Explorer/ContextMenu.cpp`) (research #35, #13).
+- #13과 같음: 판단은 `jzip-shared` 스마트 해제 계획, 실행은 `jzip-core`(`CPP/7zip/UI/Common/Extract.cpp` `DecompressArchive` 훅), 메뉴는 `jzip-shell.dll`(`CPP/7zip/UI/Explorer/ContextMenu.cpp`) (research #35, #13).
+- 셸 → 앱 인자: `JZip.exe --proto 1 --op extract --mode smart --files-from <목록>`([08. 아키텍처](../08-architecture.md) 5절). 목록 파일에 선택한 아카이브를 모두 넣어 한 번 실행하므로 S4 대기열 하나로 처리된다(FR-35-4). 기존 `CompressCall.cpp` `ExtractGroupCommand`는 근거로만 쓴다.
 - 메뉴 문구·위치: `ContextMenu.cpp:832-834`, 857-866행 (research #35).
 - 이 기능만을 위한 새 변경 지점은 없다.
 

@@ -79,16 +79,17 @@
 |---|---|---|---|
 | `Extract.FolderMode` | `smart` | 압축 풀기 (S8-02) | 폴더 만들기 기본값: `smart` / `always` / `none` |
 | `Extract.SkipDialog` | 꺼짐 | 압축 풀기 (S8-02) | S2-11로 켜짐. 켜져 있으면 S2를 띄우지 않음 |
-| `ElimDup` (기존) | 기존 값 유지 | 탐색기 메뉴 | `always`에서 이중 폴더 제거에 계속 사용 |
+| `Extract.ElimDup` | 기존 값 유지 (7-Zip `ElimDup` 값을 처음 실행 때 가져옴) | 탐색기 메뉴 | `always`에서 이중 폴더 제거에 계속 사용 |
 
 ## 7. 구현 지점
 
-- `CPP/7zip/UI/Common/Extract.cpp` `DecompressArchive`: 79-96행 `elimIsPossible` 블록 옆에 스마트 판단을 추가한다. 105행부터의 항목 루프에서 최상위 이름 집합을 먼저 모으고, 결과에 따라 `outDir`을 `outDir + 아카이브 이름`으로 바꾼다. 아카이브 이름은 70-76행의 `correctedName` 계산을 재사용한다.
-- `CPP/7zip/UI/Common/ArchiveCommandLine.cpp`: 1462-1465행 `-spe` 옆에 스마트 모드 스위치를 추가한다.
-- `CPP/7zip/UI/Common/CompressCall.cpp:255` `ExtractArchives`: 264-265행처럼 스마트 모드 스위치를 붙이는 매개변수를 추가한다. 실행 대상은 7zG가 아니라 `JZip.exe`다([07. 기술 스택](../07-tech-stack.md) 3절).
-- `jzip-shell.dll`(`CPP/7zip/UI/Explorer/ContextMenu.cpp` 기반): 838-866행 메뉴 구성에 S7-01을 추가하고, 1276-1290행 `InvokeCommand`의 `case kExtract*`에서 스마트 스위치를 넘긴다. 메뉴 플래그는 `Explorer/ContextMenuFlags.h`.
+- `jzip-shared`(`src/shared/extract/`): 스마트 해제 계획(최상위 항목 집합 → 폴더 생성 여부·결과 경로, FR-13-2~13-7). 파일 시스템 확인(FR-13-4 기존 항목 유무)은 주입된 포트로 하며, Win32 구현은 `jzip-win`(`src/shared-win/fs/`, [08](../08-architecture.md) 3절)이다. `JZip.exe` S2-05 미리보기와 `7z.exe`·`jzip-core` 해제가 같은 계획 함수를 쓴다.
+- `CPP/7zip/UI/Common/Extract.cpp` `DecompressArchive`(`JZIP-PATCH` 훅): 79-96행 `elimIsPossible` 블록 옆에서 105행부터의 항목 루프로 최상위 이름 집합을 먼저 모아 `jzip-shared` 계획 함수에 넘기고(훅이 넘기는 포트: 계획 = `jzip-shared`, 풀 위치의 기존 항목 확인 = `jzip-win` 파일 시스템 확인), 결과에 따라 `outDir`을 `outDir + 아카이브 이름`으로 바꾼다. 아카이브 이름은 70-76행의 `correctedName` 계산을 재사용한다.
+- `CPP/7zip/UI/Common/ArchiveCommandLine.cpp`: 1462-1465행 `-spe` 옆에 스마트 모드 스위치를 추가한다. 스위치 이름은 G2 진입 조건인 CLI 스위치 이름 결정 ADR을 따른다([09](../09-development-process.md) 3.1).
+- 셸 → 앱 인자: 7zG 명령줄을 만들던 `CPP/7zip/UI/Common/CompressCall.cpp:255` `ExtractArchives`(264-265행)는 근거로만 쓰고, `jzip-shell.dll`은 [08. 아키텍처](../08-architecture.md) 5절 규약으로 `JZip.exe --proto 1 --op extract --mode smart --files-from <목록>`(S7-01) 또는 `--mode always`(S7-02)를 실행한다.
+- `jzip-shell.dll`(`CPP/7zip/UI/Explorer/ContextMenu.cpp` 기반): 838-866행 메뉴 구성에 S7-01을 추가하고, 1276-1290행 `InvokeCommand`의 `case kExtract*`에서 위 `--mode` 값을 넘긴다. 메뉴 항목 정의는 `jzip-shared` 명령 등록부, 메뉴 플래그는 `Explorer/ContextMenuFlags.h`.
 - `JZip.exe`(WinUI 3) S2 화면: 라디오 3개(S2-04)와 결과 미리보기(S2-05)를 새로 만든다. 기존 파일 `CPP/7zip/UI/GUI/ExtractDialog.cpp`/`ExtractDialogRes.h`는 근거로만 쓴다(`IDX_EXTRACT_ELIM_DUP` 3430은 `always`의 이중 폴더 제거로 흡수). 결과 경로 계산은 `jzip-core`.
-- 설정 저장(`jzip-core`): `CPP/7zip/UI/Common/ZipRegistry.h:190` `CContextMenuInfo`, 대화상자 기본값은 `ZipRegistry.h` `NExtract::CInfo` 기반.
+- 설정 저장(`jzip-core` 설정 서비스, `settings.json`, [08](../08-architecture.md) 6절): 기존 구조체 `CPP/7zip/UI/Common/ZipRegistry.h:190` `CContextMenuInfo`와 대화상자 기본값 `NExtract::CInfo`는 그대로 쓰고 레지스트리 저장만 설정 어댑터로 바뀐다. `7z.exe`는 설정을 읽지 않고 스위치로만 동작한다.
 
 ## 8. 수용 기준
 
@@ -108,7 +109,7 @@
 ## 9. 범위 밖·미결 사항
 
 - 범위 밖: 아카이브 안 구조를 바꿔 푸는 기능(특정 하위 폴더만 꺼내기 등).
-- 미결: CLI 스마트 스위치 이름. 기존 스위치와 겹치지 않는 이름을 정해야 하며, research 자료에는 후보가 없다.
+- 미결: CLI 스마트 스위치 이름. 기존 스위치와 겹치지 않는 이름을 정해야 하며, research 자료에는 후보가 없다. G2 진입 조건인 "CLI 스위치 이름 결정 ADR"(F31 스위치와 함께)에서 정한다([09](../09-development-process.md) 3.1).
 - 미결: FR-13-4 충돌 시 묻지 않고 이름 폴더로 우회하는 것이 맞는지, S2-09 "같은 파일 처리" 값을 따라야 하는지. 이 문서는 기존 데이터 보호를 우선해 우회로 정했다.
 - 미결: 항목 목록을 얻으려면 전체를 읽어야 하는 스트림형 형식(예: #12가 켜진 `.tar.gz`)에서 판단 비용. research 자료에는 tar.gz 안쪽 목록을 미리 얻는 경로가 없으므로, 임시 폴더에 푼 뒤 옮기는 방식이 필요할 수 있다.
 - 06에 반영됨 (S1-02 `▾` 첫 항목 "여기에 풀기 (스마트)")

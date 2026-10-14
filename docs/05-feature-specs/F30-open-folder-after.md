@@ -62,8 +62,8 @@
 
 - 완료 후 실행: `JZip.exe`의 해제 완료 처리(S4)에서 결과 위치를 연다. 현재 완료 지점의 근거는 `CPP/7zip/UI/GUI/ExtractGUI.cpp` `CThreadExtracting::ProcessWasFinished_GuiVirt`(94행)·`ExtractGUI()`(167행) 끝, `CPP/7zip/UI/FileManager/ProgressDialog2.cpp` `CProgressDialog::OnExternalCloseMessage`(991행) (research #30).
 - 옵션 UI: `JZip.exe`(WinUI 3) S2-06·S4-05·S8-02를 새로 만든다. 기존 파일 `CPP/7zip/UI/GUI/ExtractDialog.cpp` `OnInit`(137행)/`OnOK`(299행), `ExtractDialogRes.h`, `ProgressDialog2Res.h`는 근거로만 쓴다 (research #30, #32).
-- 저장: `jzip-core` 설정(기존 `CPP/7zip/UI/Common/ZipRegistry.h` `NExtract::CInfo` 기반, research #30).
-- 컨텍스트 메뉴 경로: `jzip-shell.dll` → `JZip.exe --extract …`(현재 `UI/Common/CompressCall.cpp:255` `ExtractArchives` → 7zG `x`, research #12). `JZip.exe`가 S8 저장값을 읽는지, 실행 인자로 넘길지는 9절 미결.
+- 저장: `jzip-core` 설정 서비스(`settings.json`, [08. 아키텍처](../08-architecture.md) 6절). 기존 `CPP/7zip/UI/Common/ZipRegistry.h` `NExtract::CInfo` 구조체는 그대로 쓰고 레지스트리 저장만 설정 어댑터로 바뀐다(research #30).
+- 컨텍스트 메뉴 경로: `jzip-shell.dll` → `JZip.exe --proto 1 --op extract …`([08](../08-architecture.md) 5절, 현재는 `UI/Common/CompressCall.cpp:255` `ExtractArchives` → 7zG `x`, research #12). `Extract.OpenFolderAfter`는 실행 인자로 넘기지 않고 `JZip.exe`가 `settings.json`에서 직접 읽는다(08 5절 "인자 범위").
 
 ## 8. 수용 기준
 
@@ -80,6 +80,6 @@
 ## 9. 범위 밖·미결 사항
 
 - 범위 밖: 결과 폴더를 S1에서 여는 옵션, 압축 후 결과 파일 위치 열기.
-- 미결: S7에서 시작한 `JZip.exe` 해제가 S8 설정을 직접 읽을지, `jzip-shell.dll`이 새 실행 인자로 넘길지. research 자료에는 #31용 CLI 스위치 추가만 언급돼 있다.
+- 해결: S7에서 시작한 `JZip.exe` 해제는 S8 설정을 `settings.json`에서 직접 읽는다. 실행 인자는 메뉴 항목이 정하는 값만 담는다([08](../08-architecture.md) 5절).
 - 미결: FR-30-5에서 상위 폴더가 서로 다른 경우의 처리(첫 위치만 열기)는 임시 규칙이다. 사용자 테스트 후 확정한다.
 - 06에 반영됨 (S9-12)

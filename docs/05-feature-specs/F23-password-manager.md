@@ -52,6 +52,10 @@ j-zip은 암호를 Windows 계정에 묶인 DPAPI로 암호화해 저장하고, 
 - FR-23-17 S6-08 "+ 추가"는 이름과 암호를 입력받아 저장한다. 빈 암호는 저장하지 않는다.
 - FR-23-18 S3-08 "저장된 암호 ▾"는 저장된 항목 이름 목록을 보여 주고, 고르면 암호 입력란에 값을 채운다(가려진 상태). S6-10이 켜져 있으면 목록을 열 때 Windows Hello 확인을 거친다.
 
+### 메모리
+
+- FR-23-19 평문 암호를 담았던 버퍼(입력란에서 받은 값, 복호화한 값, 자동 시도용 사본)는 사용이 끝나면 `SecureZeroMemory`로 지운다(컴파일러 최적화로 제거되지 않는 방식). 크래시 덤프에 평문 암호가 남는 시간을 줄이기 위해서다([10](../10-logging-evidence-operations.md) 7절 덤프 안내).
+
 ## 4. GUI 명세
 
 | ID | 상태·표시 조건 | 문구 | 동작 |
@@ -81,9 +85,9 @@ j-zip은 암호를 Windows 계정에 묶인 DPAPI로 암호화해 저장하고, 
   - 같은 사용자 권한으로 실행 중인 악성 프로그램은 DPAPI로 복호화할 수 있으므로 이를 막지 못한다. Windows Hello 확인(S6-10)은 j-zip 화면 접근을 막는 UI 차원의 확인이며 저장 암호화 강도를 높이지 않는다.
   - Windows 계정 암호를 관리자 권한으로 강제 재설정하면 DPAPI 마스터 키 접근을 잃어 저장 암호를 복호화하지 못할 수 있다(FR-23-8로 처리).
 - 자동 시도는 저장된 암호를 외부로 보내지 않는다. 다만 악의적으로 만든 아카이브가 어떤 저장 암호로 열리는지(성공 여부)는 사용자가 볼 수 있는 결과로 드러나므로, 자동 시도를 원하지 않는 사용자는 S6-09를 끌 수 있다.
-- 저장 파일은 MSIX 앱 데이터 경로(사용자별)에 두며, j-zip을 제거하면 함께 지워진다(#27).
+- 저장 파일은 MSIX 앱 데이터 경로(사용자별) `LocalState\passwords.json`에 두며, j-zip을 제거하면 함께 지워진다(#27). 경로는 `JZip.exe`가 구해 `jzip-core`에 주입한다.
 - 암호 입력란 내용은 클립보드 복사를 막지 않는다(사용자 선택). 보기 토글 상태는 기존 `ShowPassword` 플래그를 따른다.
-- 저장 파일 쓰기는 임시 파일에 쓴 뒤 교체해 중간 손상을 막는다.
+- 저장 파일 쓰기·읽기는 설정 파일과 같은 규칙을 따른다([08. 아키텍처](../08-architecture.md) 6절): 명명된 뮤텍스 `Local\JZip.Passwords`를 잡고, 파일을 다시 읽어 병합한 뒤, 고유 임시 파일에 써서 `ReplaceFileW`(대상이 없으면 `MoveFileExW(MOVEFILE_REPLACE_EXISTING)`)로 교체하고 실패하면 재시도한다. 읽기에 실패하면 마지막으로 읽은 값을 유지한다.
 - 관리자 창(S6)은 비모달 창이다(06 문서 1절). 동시에 두 개를 열지 않는다.
 
 ## 6. 설정
@@ -97,9 +101,9 @@ j-zip은 암호를 Windows 계정에 묶인 DPAPI로 암호화해 저장하고, 
 ## 7. 구현 지점
 
 - `JZip.exe`(WinUI 3) 화면: S6 암호 입력 대화상자(S6-01~S6-06), 관리자 창(S6-07~S6-11), D2, S3-08 "저장된 암호 ▾". 기존 파일 `CPP/7zip/UI/FileManager/PasswordDialog.cpp`, `CPP/7zip/UI/GUI/ExtractDialog.cpp`(`IDE_EXTRACT_PASSWORD` 120), `CPP/7zip/UI/GUI/CompressDialog.cpp`(`IDE_COMPRESS_PASSWORD1` 120)는 현재 동작 근거로만 쓴다.
-- `JZip.exe`: Windows Hello 확인은 `UserConsentVerifier`(C++/WinRT, `co_await`)로 호출한다(07 문서 7절).
+- `JZip.exe`: Windows Hello 확인은 `UserConsentVerifier`(C++/WinRT, `co_await`)로 호출한다(07 문서 7절). `jzip-core`에는 `IUserConsent` 포트만 두고 `JZip.exe`가 이 구현을 주입한다(코어는 WinRT를 참조하지 않음, [08](../08-architecture.md) 1절).
 - `jzip-core` 로직: 암호 요청 지점(기존 파일 `CPP/7zip/UI/FileManager/ExtractCallback.cpp`)에서 자동 시도를 먼저 수행하고, 실패 시에만 S6 화면을 요청한다.
-- `jzip-core` 저장소: 새 파일로 둔다. 기존 설정 저장(`CPP/7zip/UI/Common/ZipRegistry.cpp`, 현재 95행 `ShowPassword`만 있음)은 참고만 한다. DPAPI(`CryptProtectData`) 호출과 파일 입출력은 이 저장소 모듈 안에만 둔다.
+- `jzip-core` 저장소: 새 파일로 둔다. 기존 설정 저장(`CPP/7zip/UI/Common/ZipRegistry.cpp`, 현재 95행 `ShowPassword`만 있음)은 참고만 한다. DPAPI(`CryptProtectData`) 호출과 파일 입출력은 이 저장소 모듈(`ISecretStore` 구현) 안에만 둔다.
 
 ## 8. 수용 기준
 
@@ -118,7 +122,7 @@ j-zip은 암호를 Windows 계정에 묶인 DPAPI로 암호화해 저장하고, 
 ## 9. 범위 밖·미결 사항
 
 - 범위 밖: 암호 동기화(클라우드·다른 PC), 내보내기·가져오기, 비밀번호 찾기(#25 제외 항목).
-- 미결: 저장 파일의 정확한 위치(MSIX 앱 데이터 `LocalState` 등)와 형식. 이 문서는 파일로 정했다(FR-23-3).
+- 해결: 저장 파일 위치는 `LocalState\passwords.json`, 쓰기 규칙은 [08](../08-architecture.md) 6절. 항목 형식은 FR-23-3.
 - 해결: Windows Hello 확인은 `Windows.Security.Credentials.UI.UserConsentVerifier`로 한다(07 문서 7절). WinUI 3 데스크톱 앱에서 확인 창이 j-zip 창 앞에 뜨는지(창 핸들 연결 방식)는 구현 때 확인한다.
 - 미결: FR-23-10의 형식별 "맞음" 판정이 기존 7-Zip 해제 콜백 흐름(파일 단위로 암호를 묻고 결과를 받는 구조)에 그대로 들어맞는지 확인이 필요하다.
 - 06에 반영됨 (D2-01, D2-02, D2-03, D2-04, S8-16, S6-07 상태 배지)

@@ -80,7 +80,7 @@ j-zip은 이름 바이트를 보고 가장 그럴듯한 인코딩을 자동으�
 
 | ID | 상태·표시 조건 | 문구 | 동작 |
 |---|---|---|---|
-| S1-12 | 이름에 인코딩 정보가 없고(ZIP 미표시 항목, ALZ/EGG 등 — #7) 그중 0x80 이상 바이트가 있을 때 | "파일명: 한국어 CP949 (자동 감지) ▾" / 직접 고른 경우 "파일명: 한국어 CP949 (직접 선택) ▾" / 확신 부족 "파일명: 한국어 CP949 (자동 감지 · 확인 필요) ▾" / 감지 꺼짐 "파일명: {코드페이지} (기본 규칙) ▾" | 클릭 = S5 |
+| S1-12 | 이름에 인코딩 정보가 없고(ZIP 미표시 항목, ALZ 등 — #7) 그중 0x80 이상 바이트가 있을 때 | "파일명: 한국어 CP949 (자동 감지) ▾" / 직접 고른 경우 "파일명: 한국어 CP949 (직접 선택) ▾" / 확신 부족 "파일명: 한국어 CP949 (자동 감지 · 확인 필요) ▾" / 감지 꺼짐 "파일명: {코드페이지} (기본 규칙) ▾" | 클릭 = S5 |
 | S5-01 | S5 열림 | "이 ZIP에는 파일명 인코딩 정보가 없음. {1순위 이름}으로 읽으면 가장 자연스러움." | — |
 | S5-02 | S5 열림 | 후보 라디오: "한국어 (CP949)", "UTF-8", "일본어 (Shift-JIS)", "중국어 간체 (GBK)", "영어 DOS (CP437)", 시스템 코드페이지(목록에 없을 때) + 점수 | 점수 내림차순. 현재 적용 값을 선택된 상태로 연다 |
 | S5-03 | S5 열림 | 제목 "미리보기 — {선택 이름}". 왼쪽 = 선택한 인코딩 결과, 오른쪽 = 변경 전 표시. 하단 "왼쪽: 선택한 인코딩 · 오른쪽: 변경 전 표시" | 라디오 선택 즉시 갱신. 0x80 이상 바이트를 가진 이름을 앞에서부터 최대 50개 |
@@ -106,26 +106,30 @@ j-zip은 이름 바이트를 보고 가장 그럴듯한 인코딩을 자동으�
 | 키 | 기본값 | 위치(S8 탭) | 설명 |
 |---|---|---|---|
 | `Encoding.AutoDetect` | 켜짐 | 압축 풀기 (S8-02), S5-04 | 인코딩 정보 없는 ZIP 파일명 자동 감지 |
-| `Encoding.Candidates` | `949,65001,932,936,437` | (화면 없음, 레지스트리) | 후보 코드페이지 목록과 동점 처리 보조 순서 |
+| `Encoding.Candidates` | `949,65001,932,936,437` | (화면 없음, `settings.json`) | 후보 코드페이지 목록과 동점 처리 보조 순서 |
 
 ## 7. 구현 지점
 
-- `CPP/7zip/Archive/Zip/ZipItem.cpp:405-462` `CItem::GetUnicodeString`: ③과 ⑤ 사이에 "감지 코드페이지" 분기(④)와 FR-17-15 항목별 UTF-8 예외를 넣는다. 함수 인자에 감지 결과를 넘길 매개변수를 추가한다. 기존 `Check_UTF8_Buf`(`ZipItem.cpp:401`)를 유효성 검사에 쓴다.
-- `CPP/7zip/Archive/Zip/ZipHandler.cpp`: 열기가 끝난 뒤 `_forceCodePage`가 꺼져 있고 자동 감지가 켜져 있으면 항목 이름 바이트로 감지를 한 번 실행해 결과를 핸들러 멤버에 저장한다. 389·398·501·748·752행의 `GetUnicodeString` 호출에 그 값을 넘긴다. 아카이브 주석(227행)도 같은 값을 쓰게 한다(#16).
+- `jzip-shared`(`src/shared/encoding/`): 후보 점수(FR-17-4~17-12)와 혼합 이름 판단(FR-17-15)을 둔다. 바이트 → 문자 변환은 주입된 코드페이지 변환기로 하고(Win32 구현은 `jzip-win`(`src/shared-win/locale/`)의 `MultiByteToWideChar(MB_ERR_INVALID_CHARS)`, 시스템 `CP_OEMCP`/`CP_ACP` 값 조회도 `jzip-win`), UTF-8 유효성은 기존 `Check_UTF8_Buf`(`ZipItem.cpp:401`)와 같은 규칙을 쓴다.
+- `CPP/7zip/Archive/Zip/ZipItem.cpp:405-462` `CItem::GetUnicodeString`(`JZIP-PATCH` 훅): ③과 ⑤ 사이에 "감지 코드페이지" 분기(④)와 FR-17-15 항목별 UTF-8 예외를 넣고 판단은 `jzip-shared`를 호출한다. 훅이 넘기는 포트: 점수기 = `jzip-shared`, 코드페이지 변환기 = `jzip-win`. 함수 인자에 감지 결과를 넘길 매개변수를 추가한다.
+- `CPP/7zip/Archive/Zip/ZipHandler.cpp`: 열기가 끝난 뒤 `_forceCodePage`가 꺼져 있고 자동 감지가 켜져 있으면 항목 이름 바이트로 감지(점수기 `jzip-shared` + 변환기 `jzip-win`)를 한 번 실행해 결과를 핸들러 멤버에 저장한다. 389·398·501·748·752행의 `GetUnicodeString` 호출에 그 값을 넘긴다. 아카이브 주석(227행)도 같은 값을 쓰게 한다(#16).
 - `CPP/7zip/Archive/Zip/ZipHandlerOut.cpp:564-570`: 기존 `cp` 옵션 옆에 자동 감지 켜기/끄기 속성을 추가한다(이름은 9절 미결).
 - `CPP/7zip/Archive/Zip/ZipHandler.cpp` `GetArchiveProperty`: 감지·적용된 코드페이지를 `kpidCodePage`로 내도록 추가한다(현재 Zip 핸들러에는 없음). S1-12 칩이 이 값을 읽는다.
 - `CPP/7zip/UI/Agent/Agent.cpp:1677`(`CAgent::Open`), `:1732`(`CAgent::ReOpen`): `options.props = NULL` 대신 아카이브별 속성 목록(`cp=…`)을 넘길 수 있게 한다.
 - `JZip.exe`(WinUI 3) 화면: S1-12 칩, S5, S2-10을 새로 만든다. research 자료가 변경 지점으로 든 7zFM 메뉴(`CPP/7zip/UI/FileManager/resource.rc`, `MyLoadMenu.cpp`)는 수정하지 않고, 코드페이지 지정 → 다시 열기 명령을 `jzip-core`에 두어 S1-12/S5에서 호출한다.
-- 해제: `ArchiveCommandLine.cpp:1578` `SetMethodOptions` 경로로 `-mcp`가 이미 전달되므로, S2-10 값은 `jzip-core` 해제 옵션의 `cp` 속성으로 넘긴다(7zG 명령줄의 `-mcp`와 같은 의미).
+- 해제: `ArchiveCommandLine.cpp:1578` `SetMethodOptions` 경로로 `-mcp`가 이미 전달되므로, S2-10 값은 `jzip-core` 해제 옵션의 `cp` 속성으로 넘긴다(명령줄 `-mcp`와 같은 의미).
+- 설정 전달: `Encoding.AutoDetect`·`Encoding.Candidates`는 `jzip-core`가 `settings.json`에서 읽어 핸들러 속성으로 넘긴다. `7z.exe`는 `settings.json`을 읽지 않으므로 스키마 기본값(자동 감지 켜짐, 기본 후보)과 `-mcp` 등 스위치로 동작한다([08](../08-architecture.md) 1절).
 
 ## 8. 수용 기준
 
 샘플(모두 UTF-8 플래그 꺼짐, Unicode extra 없음):
 `kr_ntfs.zip`(HostOS NTFS, 이름 CP949: `발표자료_최종.pptx`, `보고서/1장_서론.hwp`), `kr_unix.zip`(HostOS Unix, 이름 CP949, 같은 이름), `utf8_noflag.zip`(HostOS NTFS, 이름 UTF-8 바이트), `jp.zip`(이름 Shift-JIS: `資料/ひらがな.txt`), `cn.zip`(이름 GBK: `资料/报告.docx`), `ascii.zip`(이름 모두 ASCII), `mixed_unix.zip`(HostOS Unix, 항목 3개는 UTF-8 바이트, 2개는 CP949 바이트).
 
-- [ ] 시스템 로캘 영어(미국)에서 `kr_ntfs.zip`을 열면 S1-14에 `발표자료_최종.pptx`가 보이고, S1-12가 "파일명: 한국어 CP949 (자동 감지)"이다.
-- [ ] 시스템 로캘 한국어에서 `kr_unix.zip`을 열면 한글 이름이 바르게 보인다. (현재 7-Zip은 깨진다.)
-- [ ] `utf8_noflag.zip`은 어느 로캘에서도 UTF-8로 감지된다.
+- [ ] 1a [로직] 시스템 로캘 영어(미국)에서 `kr_ntfs.zip`을 열면 항목 이름이 `발표자료_최종.pptx`로 디코딩되고, 감지 결과가 CP949(자동 감지)이다.
+- [ ] 1b [화면] 같은 조건에서 S1-14에 `발표자료_최종.pptx`가 보이고, S1-12가 "파일명: 한국어 CP949 (자동 감지)"이다.
+- [ ] 2a [로직] 시스템 로캘 한국어에서 `kr_unix.zip`을 열면 한글 이름이 바르게 디코딩된다. (현재 7-Zip은 깨진다.)
+- [ ] 2b [화면] 같은 조건에서 S1-14에 한글 이름이 바르게 보인다.
+- [ ] 3a [로직] `utf8_noflag.zip`은 어느 로캘에서도 UTF-8로 감지된다. (화면 부분이 없어 하위 항목은 3a 하나다.)
 - [ ] 시스템 로캘 한국어에서 `jp.zip`은 Shift-JIS, `cn.zip`은 GBK로 감지된다.
 - [ ] `ascii.zip`을 열면 S1-12 칩이 보이지 않는다.
 - [ ] `mixed_unix.zip`을 열면 다섯 이름이 모두 바르게 보인다(FR-17-15).

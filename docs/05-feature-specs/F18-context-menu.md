@@ -57,14 +57,14 @@
 
 | 키 | 기본값 | 위치(S8 탭) | 설명 |
 |---|---|---|---|
-| `ContextMenu` (기존 `CContextMenuInfo`) | 기존 기본값 | 탐색기 메뉴 (S8-05, S8-06) | 항목 위치·아이콘·Shift 표시 |
+| `ContextMenu.*` (F34 6절 키, 기존 `CContextMenuInfo` 값을 처음 실행 때 가져옴) | 기존 기본값 | 탐색기 메뉴 (S8-05, S8-06) | 항목 위치·아이콘·Shift 표시. `settings.json`에 저장([08](../08-architecture.md) 6절) |
 
 ## 7. 구현 지점
 
-셸 확장은 `jzip-shell.dll`(7-Zip `UI/Explorer` 기반, XAML 없음)이며, 메뉴 명령은 `JZip.exe`를 실행 인자와 함께 띄운다(현재 7zG 역할, [07. 기술 스택](../07-tech-stack.md) 3절). S8 설정 화면은 `JZip.exe`에 새로 만든다.
+셸 확장은 `jzip-shell.dll`(7-Zip `UI/Explorer` 기반, XAML 없음)이며, `jzip-shared`·`jzip-win`만 링크한다. 메뉴 명령은 [08. 아키텍처](../08-architecture.md) 5절 규약(`JZip.exe --proto 1 --op <op> …`)으로 `JZip.exe`를 띄운다(현재 7zG가 하던 역할, [07. 기술 스택](../07-tech-stack.md) 3절). 항목별 `--op`: S7-04 `extract --dialog`, S7-05 `open`, S7-06 `test`, S7-07 `recompress --format 7z`, S7-08 `compress --dialog`, S7-09 `settings --page shell-menu`, S7-11 `compress --format zip`/`7z`, S7-13 `hash`. S8 설정 화면은 `JZip.exe`에 새로 만든다.
 
 - `CPP/7zip/UI/Explorer/ContextMenu.cpp` `QueryContextMenu`(700~1100행대), `g_Commands`(`:273-283`): 항목 이름·순서를 바꾼다.
-- `CPP/7zip/UI/Explorer/ContextMenuFlags.h`, `CPP/7zip/UI/Common/ZipRegistry.h:190` `CContextMenuInfo`: S8-05의 3단 위치를 저장할 수 있게 한다(현재는 켜기/끄기 체크 목록).
+- 메뉴 모델: 항목·표시 조건·3단 위치는 `jzip-shared` 명령 등록부(`src/shared/commands/`)에 둔다. `CPP/7zip/UI/Explorer/ContextMenuFlags.h`, `CPP/7zip/UI/Common/ZipRegistry.h:190` `CContextMenuInfo`(현재는 켜기/끄기 체크 목록)는 기존 값을 가져오는 근거로 쓰고, 값은 `settings.json`의 `ContextMenu.*` 키에 저장한다([08](../08-architecture.md) 6절).
 - 등록: 기존 `DllRegisterServer`(`DllExportsExplorer.cpp:237`)와 설치기(`7zipInstall.c:895-917`)의 레지스트리 등록은 쓰지 않고, j-zip CLSID를 MSIX 매니페스트(`windows.comServer`, `windows.fileExplorerContextMenus`)에 선언한다(F19 7절). 예전 메뉴 표시 방식은 SP-1에서 확인한다.
 
 ## 8. 수용 기준

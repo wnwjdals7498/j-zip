@@ -13,17 +13,21 @@
 | [02. 개발 계획](docs/02-development-plan.md) | 준비, 소스 구조, 개발 단계, 테스트, 배포, 라이선스 |
 | [03. 기능 벤치마크](docs/03-feature-benchmark.md) | 반디집 대비 7-Zip 기능 비교 (#1–#36), 우선순위 |
 | [04. GUI 레퍼런스](docs/04-gui-reference.md) | 화면 S1–S9 명세, 디자인 원칙·토큰, UI 기술(WinUI 3로 확정) |
-| [05. 기능 세부 명세](docs/05-feature-specs/README.md) | 기능 #1–#36별 요구사항, 반디집 참고 출처, 7-Zip 근거, 연결된 GUI 요소, 수용 기준 |
+| [05. 기능 세부 명세](docs/05-feature-specs/README.md) | 기능 #1–#36별 요구사항, 반디집 참고 출처, 7-Zip 근거, 연결된 GUI 요소, 수용 기준 + 운영 명세(진단·로그) |
 | [06. GUI 명세서](docs/06-gui-spec.md) | 창 유형, 컴포넌트(C01–C22), 키보드·문구·접근성 규칙, 화면별 요소 ID(S1-01…), 화면 흐름 |
-| [07. 기술 스택](docs/07-tech-stack.md) | 언어·UI(WinUI 3 + C++/WinRT)·빌드·배포(MSIX)·의존성 결정, 구성 요소(JZip.exe·jzip-core·jzip-shell), 선행 검증(SP-1~6) |
+| [07. 기술 스택](docs/07-tech-stack.md) | 언어·UI(WinUI 3 + C++/WinRT)·빌드·배포(MSIX)·의존성 결정, 구성 요소(JZip.exe·jzip-core·jzip-shared·jzip-shell), 빌드 구성, 선행 검증(SP-1~6) |
+| [08. 아키텍처](docs/08-architecture.md) | 계층 구조, 디자인 패턴(MVVM·포트와 어댑터·명령·전략), 확장 지점, 셸↔앱 규약, 설정 공유, 의존성 검토 |
+| [09. 구현 절차](docs/09-development-process.md) | 코딩 에이전트 운영: 단계(G0–G6)와 게이트, 기능·화면별 단계, 작업 카드, 역할 분리, 브랜치·PR, 완료 정의, ADR, 도구 계약 |
+| [10. 로그·증거·운영](docs/10-logging-evidence-operations.md) | 운영/개발 로그 구분, 증거 종류(E1–E10)와 매니페스트, 단계 종료 정리, 출시 체크리스트, 최종 운영 |
 | [7-Zip 26.04 소스 검증](docs/research/7zip-26.04-source-facts.md) | 기능별 현재 구현 근거(파일·줄)와 변경 지점 |
+| [운영 조사](docs/research/ops-research-2026-10.md) | 셸 확장 실행 위치, MSIX 가상화·설정 공유, C++/WinRT·Windows App SDK 지원 주기, Windows 10 지원 현황, ETW·덤프 |
 | [기술 스택 조사](docs/research/tech-research-2026-10.md) | 07 결정의 조사 근거(NanaZip, Windows App SDK, MSIX·셸 등록, ALZ/EGG, LZ4, CI), 기준일 2026-10-14 |
 | [GUI 디자인 원본](design/) | Claude Design 프로젝트 폴더 (`canvas.json` + 화면별 `.dc.html`), 형식 설명 포함 |
 
 ## 우선순위 요약
 
 1. **P1 (쉬움·효과 큼)**: 파일명 인코딩 자동 감지(#17), TGZ 한 번에 풀기(#12), 스마트 해제(#13), 해제 후 폴더 열기(#30), 해제 후 원본 휴지통(#31), 완료 알림(#32)
-2. **P2 (중간)**: ALZ/EGG 해제(#7), 비밀번호 관리자(#23), 분할 파일 인식(#33), 썸네일(#26), 다크모드(#28), Win11 메뉴(#19)
+2. **P2 (중간)**: ALZ 해제(#7), 비밀번호 관리자(#23), 분할 파일 인식(#33), 썸네일(#26), 다크모드(#28), Win11 메뉴(#19)
 3. **P3 (후순위)**: ZIP 복구(#24), 악성코드 검사(#21), 추가 포맷(#5) 등
 4. **제외**: ACE 해제(#9), 비밀번호 찾기(#25)
 

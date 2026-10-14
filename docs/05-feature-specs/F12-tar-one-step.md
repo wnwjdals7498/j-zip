@@ -65,12 +65,13 @@
 
 ## 7. 구현 지점
 
-research 자료의 두 가지 방식 중 하나를 고른다.
+"안쪽이 tar인 단일 스트림인가" 판정은 `jzip-shared`(`src/shared/tar/`)에 두고, 아래 7-Zip 파일에는 그 판정을 부르는 `JZIP-PATCH` 훅만 넣는다([08. 아키텍처](../08-architecture.md) 1절). 훅 위치는 research 자료의 두 가지 방식 중 하나를 고른다.
 
 - (a) `Archive/GzHandler.cpp`, `Bz2Handler.cpp`, `XzHandler.cpp`(`:383` 빈 case), `ZstdHandler.cpp`의 `GetArchiveProperty`에서 단일 항목이 tar일 때 `kpidMainSubfile = 0`을 돌려줌 → `CArchiveLink::Open`(`OpenArchive.cpp:3221`, `:3309`)이 자동으로 안쪽을 엶. FM 탐색 동작까지 바뀌므로 FR-12-8을 지키려면 옵션으로 켜고 끌 수 있어야 함.
 - (b) `CPP/7zip/UI/Common/Extract.cpp` `DecompressArchive`(36행) 또는 `Extract`(288행)에서 결과가 tar 하나면 이어서 풂.
-- S2-08 컨트롤은 `JZip.exe`(WinUI 3) S2 화면에 새로 만든다(기존 파일 `CPP/7zip/UI/GUI/ExtractDialog.cpp`/`ExtractDialogRes.h`는 근거로만 사용). 기본값 저장은 `jzip-core` 설정(기존 `UI/Common/ZipRegistry.h` `NExtract::CInfo` 기반, research 자료 #30과 같은 위치).
-- 우클릭 경로: `jzip-shell.dll`이 `JZip.exe`에 넘기는 실행 인자에 이 옵션을 반영한다(기존 `UI/Common/CompressCall.cpp:255` `ExtractArchives`의 7zG 명령줄 구성 기반).
+- S2-08 컨트롤은 `JZip.exe`(WinUI 3) S2 화면에 새로 만든다(기존 파일 `CPP/7zip/UI/GUI/ExtractDialog.cpp`/`ExtractDialogRes.h`는 근거로만 사용). 기본값 저장은 `jzip-core` 설정 서비스(`settings.json`, [08](../08-architecture.md) 6절). 기존 `UI/Common/ZipRegistry.h` `NExtract::CInfo` 구조체는 그대로 쓰고 레지스트리 저장만 설정 어댑터로 바뀐다.
+- 우클릭 경로: `jzip-shell.dll`은 `JZip.exe --proto 1 --op extract --mode … --files-from …`([08](../08-architecture.md) 5절)으로 넘기고, `JZip.exe`가 `Extract.TarOneStep`(S8-11) 값을 `settings.json`에서 직접 읽는다. 기존 `UI/Common/CompressCall.cpp:255` `ExtractArchives`의 7zG 명령줄 구성은 근거로만 쓴다.
+- CLI(`7z.exe`): `settings.json`을 읽지 않으므로 스키마 기본값(켬)과 스위치로 동작한다.
 
 ## 8. 수용 기준
 

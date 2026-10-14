@@ -67,7 +67,7 @@
 
 - `JZip.exe`(WinUI 3) S3 화면: S3-07 드롭다운, S3-13 조각 이름 안내, 인라인 오류를 새로 만든다. 기존 파일 `CPP/7zip/UI/GUI/CompressDialog.cpp:495`(콤보 채우기), `:1216-1232`(값 검사), `CompressDialogRes.h:10` `IDC_COMPRESS_VOLUME`은 현재 동작 근거로만 쓴다.
 - `jzip-core` 로직: 프리셋 목록과 크기 문자열 해석·검사. 기존 파일 `CPP/7zip/UI/FileManager/SplitUtils.cpp:61` `k_Sizes[]`, `:75` `AddVolumeItems()`의 규칙을 옮겨 프리셋을 교체한다.
-- 사용자 프리셋 저장소는 research 자료에 기존 위치가 없음. 새로 둔다(§9).
+- 사용자 프리셋은 설정 서비스의 `Compress.SplitPresets` 키로 `settings.json`에 저장한다([08. 아키텍처](../08-architecture.md) 6절).
 
 ## 8. 수용 기준
 
@@ -84,6 +84,6 @@
 
 - 범위 밖: FM의 파일 자르기/합치기(`IDM_SPLIT`/`IDM_COMBINE`) 화면 개편.
 - 미결: 메일 서비스의 첨부 한도는 인코딩 후 크기 기준인 경우가 많아 25 × 2^20 바이트 조각이 거절될 수 있다. 프리셋 값을 더 작게 잡을지 결정 필요.
-- 미결: 사용자 프리셋의 저장 위치(7-Zip `ZipRegistry` 계열 레지스트리 vs 별도 설정 파일). research 자료에 근거 없음.
+- 해결: 사용자 프리셋은 레지스트리가 아니라 설정 서비스(`settings.json`)에 저장한다([08](../08-architecture.md) 6절).
 - 미결: 06 문서는 S3-07을 C11 드롭다운으로 정의한다. "직접 입력…" 시 편집 가능한 콤보로 바뀌는 형태가 C11 규칙 안에 있는지 확인 필요.
 - 06에 반영됨 (S3-13)

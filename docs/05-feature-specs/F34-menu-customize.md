@@ -61,7 +61,8 @@
 
 - 설정 페이지: `JZip.exe`(WinUI 3) S8 탐색기 메뉴 탭(S8-04~S8-06)을 새로 만든다. 7zFM 설정 페이지 `CPP/7zip/UI/FileManager/MenuPage.cpp`(`kMenuItems[]` 49-70행, `OnInit` 96행, `OnApply` 299행), `MenuPage.rc`, `MenuPageRes.h`는 현재 항목·동작 근거로만 쓴다 (research #34).
 - 플래그: `CPP/7zip/UI/Explorer/ContextMenuFlags.h` (research #34). 항목별 위치를 담으려면 현재의 켬/끔 비트 외에 위치 값이 필요하다.
-- 저장: `jzip-core` 설정(기존 `CPP/7zip/UI/Common/ZipRegistry.h:190` `CContextMenuInfo` 기반, research #34). `JZip.exe`(패키지 앱)가 쓴 값을 탐색기 안의 `jzip-shell.dll`이 읽을 수 있는 위치에 둔다(9절 미결).
+- 저장: `jzip-core` 설정 서비스가 `settings.json`의 `ContextMenu.*` 키로 저장한다([08. 아키텍처](../08-architecture.md) 6절). 기존 `CPP/7zip/UI/Common/ZipRegistry.h:190` `CContextMenuInfo`(research #34)는 FR-34-6의 첫 가져오기(7-Zip 레지스트리 값 읽기 전용) 근거로 쓴다. `jzip-shell.dll`은 같은 파일을 08 6절의 셸 확장 규칙(DLL 경로에서 PFN 유도, 공유 읽기, 실패 시 마지막 캐시 값)으로 읽는다.
+- 메뉴 모델: 항목·기본 위치·표시 조건은 `jzip-shared` 명령 등록부(`src/shared/commands/`). S7 메뉴와 S8-05 표가 같은 등록부를 읽는다.
 - 메뉴 구성(`jzip-shell.dll`): `CPP/7zip/UI/Explorer/ContextMenu.cpp` `QueryContextMenu`(700~1100행대) (research #18), Win11 메뉴는 `EnumSubCommands`(1756행) (research #19). 등록은 MSIX 매니페스트(#19).
 
 ## 8. 수용 기준
@@ -82,4 +83,4 @@
 - 해결: 7-Zip의 기존 해시 메뉴는 유지한다. 06에 S7-13 "해시 값 계산 ▸"를 추가하고 S8-05 항목 목록에 넣었다.
 - 해결: 제품 화면 문구는 "j-zip 안에"(S8-05), "j-zip ▸"(S7-03)로 통일했다(06, 04). Settings·ContextMenu 디자인의 "7-Zip" 표기는 디자인 쪽에서 고친다.
 - 미결: Settings.dc.html의 항목 이름 `"폴더명\"에 풀기`와 06 문서 S7-02 `"{이름}\"에 풀기`의 표기 차이.
-- 미결: 메뉴 설정 저장 위치. MSIX 앱의 앱 데이터·레지스트리 쓰기는 패키지 안으로 가상화될 수 있으므로, 탐색기 프로세스에서 도는 `jzip-shell.dll`이 같은 값을 읽을 수 있는 방식(패키지 설정 API 등)을 SP-1에서 함께 확인한다.
+- 해결: 메뉴 설정은 패키지 `LocalState\settings.json`에 저장하고 셸 확장이 경로로 읽는다([08. 아키텍처](../08-architecture.md) 6절). 실제 실행 프로세스와 읽기 성공 여부는 SP-1에서 로그로 확인한다.

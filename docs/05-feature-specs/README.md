@@ -6,7 +6,9 @@
 - 화면 요소 ID(`S2-04` 등): [06. GUI 명세서](../06-gui-spec.md)
 - 7-Zip 근거(파일·줄): [research/7zip-26.04-source-facts.md](../research/7zip-26.04-source-facts.md)
 - 디자인 원본: [`design/project/`](../../design/project/)
-- 기술 스택·구성 요소(`JZip.exe`, `jzip-core.lib`, `7z.dll`, `jzip-shell.dll`): [07. 기술 스택](../07-tech-stack.md)
+- 기술 스택·구성 요소(`JZip.exe`, `jzip-core.lib`, `jzip-shared.lib`, `jzip-win.lib`, `7z.dll`, `jzip-shell.dll`, `7z.exe`): [07. 기술 스택](../07-tech-stack.md)
+- 설정 저장(`settings.json`)과 셸↔앱 실행 인자 규약: [08. 아키텍처](../08-architecture.md) 5절, 6절
+- 기능·화면별 구현 단계(G2–G5): [09. 구현 절차](../09-development-process.md) 3.3
 
 ## 목록
 
@@ -18,7 +20,7 @@
 | 4 | [F04 AES-256 암호](F04-aes256.md) | — | ✅ | S3 S6 |
 | 5 | [F05 추가 압축 포맷 생성](F05-create-formats.md) | P3 | △ | S3 |
 | 6 | [F06 자동 해제 EXE](F06-sfx.md) | P3 | △ | S3 |
-| 7 | [F07 ALZ/EGG 해제](F07-alz-egg.md) | P2 | ❌ | S1 S2 |
+| 7 | [F07 ALZ 해제](F07-alz.md) | P2 | ❌ | S1 S2 |
 | 8 | [F08 ZSTD/LZ4 해제](F08-zstd-lz4.md) | P3 | △ | S1 |
 | 9 | [F09 ACE 해제 (제외)](F09-ace.md) | 제외 | ❌ | — |
 | 10 | [F10 풀지 않고 목록 보기](F10-browse.md) | — | ✅ | S1 |
@@ -49,9 +51,19 @@
 | 35 | [F35 여러 개 각각 폴더로 풀기](F35-extract-each.md) | — | ✅ | S7 |
 | 36 | [F36 탭 탐색기](F36-tabs.md) | P3 | ❌ | S1 |
 
+### 운영
+
+기능 벤치마크(#1–#36) 밖에서 j-zip 운영에 필요한 사용자 기능이다. 같은 양식을 따르며 요구사항 ID는 `FR-OPS-<번호>`다.
+
+| ID | 문서 | 순위 | 7-Zip | 화면 |
+|---|---|---|---|---|
+| OPS | [OPS 진단·로그 운영](OPS-diagnostics.md) | — | ❌ | S8 (S8-22, S8-23, S8-24) |
+
 ## 문서 양식
 
 모든 기능 문서는 아래 양식을 따른다. 이미 있는 기능(✅, 순위 —)과 제외 기능은 해당 없는 절을 "해당 없음"으로 짧게 적는다.
+
+8절 수용 기준에는 항목마다 `[로직]`(CLI·단위·코퍼스 테스트로 증명, G2 게이트 대상) 또는 `[화면]`(화면·셸 증거로 증명, G3 이후) 태그를 단다. 이미 작성된 F01–F36 문서는 한꺼번에 다시 태그하지 않고, **그 기능의 작업 카드를 만들 때** 명세에 태그를 달며 작업 카드는 그 태그를 그대로 옮긴다([09](../09-development-process.md) 3.4). 한 기준에 로직과 화면이 섞여 있으면 명세 PR에서 하위 항목 `1a [로직]` / `1b [화면]`으로 나눌 수 있다(뜻은 그대로, ADR 불필요). 예: [F17](F17-filename-encoding.md) 8절 1a·1b, 2a·2b, 3a.
 
 ```markdown
 # F{NN}. {기능 이름}
@@ -86,10 +98,12 @@
 | 키 | 기본값 | 위치(S8 탭) | 설명 |
 
 ## 7. 구현 지점
-j-zip 구성 요소(`JZip.exe` 화면 / `jzip-core` 로직 / `7z.dll` 핸들러 / `jzip-shell.dll`)별 구현 위치. 7-Zip 소스 위치(파일·클래스·함수·리소스 ID)는 research 자료에 있는 것만 적으며, 7zFM·7zG 화면 파일은 동작 근거로만 쓴다.
+j-zip 구성 요소(`JZip.exe` 화면 / `jzip-shared` 순수 로직 / `jzip-win` Win32 포트 구현 / `jzip-core` 작업·설정 서비스 / `7z.dll` 핸들러 / `jzip-shell.dll` / `7z.exe`)별 구현 위치. 설정 저장은 설정 서비스(`settings.json`, 08 6절), 셸이 앱을 부르는 인자는 08 5절 `--proto 1 --op …` 형식으로 적는다. 7-Zip 소스 위치(파일·클래스·함수·리소스 ID)는 research 자료에 있는 것만 적으며, 7zFM·7zG 화면 파일은 동작 근거로만 쓴다.
 
 ## 8. 수용 기준
-- [ ] 확인 가능한 체크리스트
+- [ ] [로직] CLI·단위·코퍼스 테스트로 확인 가능한 항목
+- [ ] [화면] 화면·셸 증거(E5 등)로 확인하는 항목
+- [ ] 1a [로직] / 1b [화면] 로직과 화면이 섞인 기준을 나눈 하위 항목
 
 ## 9. 범위 밖·미결 사항
 ```

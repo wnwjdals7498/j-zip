@@ -64,7 +64,7 @@
 - RAR 대안: `CPP/7zip/Archive/Rar/RarHandler.cpp` `Open2`(1060행)의 주석 블록(1106-1110행)을 살리고 `Rar/RarVol.h:93` `MakeBeforeFirstName`을 쓴다 (research #33). RAR5는 `Rar5Handler.cpp:2292-2295` (research #33).
 - Split: `CPP/7zip/Archive/SplitHandler.cpp:163-176`의 첫 조각 조건 (research #33).
 - ZIP은 `ZipIn.cpp` `ReadVols`가 이미 처리하므로 변경 없음 (research #33).
-- S1-21 표시와 S9 분할 안내(S9-07~S9-10)는 `JZip.exe`(WinUI 3) 화면에 새로 만든다. 조각 목록·누락 판정은 `jzip-core`가 제공한다. 7-Zip에는 해당 화면이 없다.
+- S1-21 표시와 S9 분할 안내(S9-07~S9-10)는 `JZip.exe`(WinUI 3) 화면에 새로 만든다. 분할 세트 규칙(조각 이름 판정, 첫 조각·누락 계산)은 `jzip-shared`(`src/shared/volume/`)에 두고 폴더 목록은 주입된 파일 시스템 인터페이스로 받는다. 위 7-Zip 파일의 경로 변환도 `JZIP-PATCH` 훅에서 같은 규칙을 호출한다. 7-Zip에는 해당 화면이 없다.
 
 ## 8. 수용 기준
 
