@@ -19,6 +19,7 @@
 | [08. 아키텍처](docs/08-architecture.md) | 계층 구조, 디자인 패턴(MVVM·포트와 어댑터·명령·전략), 확장 지점, 셸↔앱 규약, 설정 공유, 의존성 검토 |
 | [09. 구현 절차](docs/09-development-process.md) | 코딩 에이전트 운영: 단계(G0–G6)와 게이트, 기능·화면별 단계, 작업 카드, 역할 분리, 브랜치·PR, 완료 정의, ADR, 도구 계약 |
 | [10. 로그·증거·운영](docs/10-logging-evidence-operations.md) | 운영/개발 로그 구분, 증거 종류(E1–E10)와 매니페스트, 단계 종료 정리, 출시 체크리스트, 최종 운영 |
+| [11. 구현 작업 목록](docs/11-implementation-backlog.md) | 단계(G0–G6)별 작업 110개, 선행 관계·핵심 경로·병렬 묶음, 기능별 작업 찾아보기 |
 | [7-Zip 26.04 소스 검증](docs/research/7zip-26.04-source-facts.md) | 기능별 현재 구현 근거(파일·줄)와 변경 지점 |
 | [운영 조사](docs/research/ops-research-2026-10.md) | 셸 확장 실행 위치, MSIX 가상화·설정 공유, C++/WinRT·Windows App SDK 지원 주기, Windows 10 지원 현황, ETW·덤프 |
 | [기술 스택 조사](docs/research/tech-research-2026-10.md) | 07 결정의 조사 근거(NanaZip, Windows App SDK, MSIX·셸 등록, ALZ/EGG, LZ4, CI), 기준일 2026-10-14 |
