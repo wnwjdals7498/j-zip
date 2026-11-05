@@ -32,7 +32,7 @@ j-zip의 코드는 외부 코딩 모델이 쓰고, Claude Sonnet 세션이 계�
 | reviewer (검토) | **구현 모델이 아닌 다른 외부 모델**, 읽기 전용 | 명세 일치·결함·단순화·금지 패턴·범위 검토, 심각도가 붙은 지적 목록 작성 | 파일 수정 (지적만), 구현 |
 | verifier (검증) | 새 Claude Sonnet 서브에이전트 세션 (오케스트레이터 컨텍스트를 받지 않음) | 깨끗한 체크아웃에서 빌드·테스트·게이트를 다시 실행해 증거 재현 확인, PR 코멘트 `JZIP-VERIFY`([10](10-logging-evidence-operations.md) 3.3) 게시 | 코드 수정, 증거 없는 승인 |
 
-- 오케스트레이터가 쓸 수 있는 경로: `work/tasks/**`, `work/handoff/**`, `work/decisions/**`, `work/evidence/**`(스크립트 출력만). `docs/**` 갱신도 카드로 만들어 구현 모델에게 맡긴다. 예외로 **원본 가져오기**(4.10)에 한해 `upstream/7zip/**`(git subtree 명령이 만드는 커밋)와 `third_party/**`(카드에 고정된 원본의 동봉)에 쓴다. 이 두 경로에 손으로 편집하지 않는다.
+- 오케스트레이터가 쓸 수 있는 경로: `work/tasks/**`, `work/handoff/**`, `work/decisions/**`, `work/evidence/**`(스크립트 출력만), `work/pmt/**`(PMT 명령 출력과 Item 본문, [work/pmt/README.md](../work/pmt/README.md)). `docs/**` 갱신도 카드로 만들어 구현 모델에게 맡긴다. 예외로 **원본 가져오기**(4.10)에 한해 `upstream/7zip/**`(git subtree 명령이 만드는 커밋)와 `third_party/**`(카드에 고정된 원본의 동봉)에 쓴다. 이 두 경로에 손으로 편집하지 않는다.
 - 오케스트레이터의 "1차 확인"(4.9)은 범위·빌드 확인이지 코드 승인이 아니다. 승인은 reviewer와 verifier의 결과로만 성립한다.
 - 구현 모델이 바뀌면(6절) 검토 모델도 다시 "그 반대"로 정한다. 코드를 쓴 모델은 그 코드를 검토하지 않는다.
 
@@ -232,7 +232,7 @@ work/handoff/
 | `RESULT*.md`, `REVIEW-<n>.md`, `RUNLOG.md`, `import-<n>.log`, 마지막 메시지 파일 | 한다 | 외부 실행(또는 원본 가져오기)이 끝난 뒤 오케스트레이터가 **기록 전용 커밋**으로 모아 커밋 |
 | `*.jsonl`, `*-stderr.log` | 하지 않는다 | `.gitignore` 대상(`work/handoff/**/*.jsonl`, `work/handoff/**/*-stderr.log`). `RUNLOG.md`에 SHA-256과 줄 수를 적고, 정리 단계에서 `.omc/artifacts/handoff/<작업 ID>/`(로컬, 커밋 안 됨)로 옮긴다. 증거로 참조해야 하면 CI 아티팩트로 올려 매니페스트에서 참조한다 |
 
-- **기록 전용 커밋**: `work/handoff/**` 또는 `work/evidence/**`만 바꾸는 커밋이다. [09](09-development-process.md) 7절의 CI 경로 필터와 [10](10-logging-evidence-operations.md) 3.3의 "매니페스트 전용 커밋" 규칙을 이 정의로 확장한다(11절). 변경 줄 수 400줄 기준([09](09-development-process.md) 1절)에서 두 경로는 제외한다.
+- **기록 전용 커밋**: `work/handoff/**`, `work/evidence/**`, `work/pmt/**`만 바꾸는 커밋이다. [09](09-development-process.md) 7절의 CI 경로 필터와 [10](10-logging-evidence-operations.md) 3.3의 "매니페스트 전용 커밋" 규칙을 이 정의로 확장한다(11절). 변경 줄 수 400줄 기준([09](09-development-process.md) 1절)에서 세 경로는 제외한다. `work/pmt/**`는 PMT 결정 D1(2026-11-05, [work/pmt/README.md](../work/pmt/README.md) 5절)로 추가됐다.
 - `PACKET.md`는 코드 커밋보다 먼저 있으므로 기록 전용 커밋 규칙과 충돌하지 않는다.
 - 파일 인코딩은 UTF-8(BOM 없음), 줄 끝은 LF다.
 
@@ -720,4 +720,4 @@ E1, E2 (E9는 검토·검증 단계에서 만들어진다)
 | [10. 로그·증거·운영](10-logging-evidence-operations.md) | 3.3 "매니페스트 전용 커밋"을 기록 전용 커밋으로 확장, 매니페스트에 `## 외부 실행 기록`(`RUNLOG.md` 링크, 실행 횟수, 모델) 절 추가(`new-manifest.ps1`이 `work/handoff/<작업 ID>/RUNLOG.md`가 있으면 자동 작성, `G0-INFRA-T07` 범위), E9에 `REVIEW-<n>.md` 포함, 수동 작성 매니페스트 규칙(3.3), "비어 있음" 정의(5절) |
 | `work/tasks/README.md` | 카드 양식에 `권장 구현 모델`·`검토 모델` 행, 이 문서 4.3(PACKET)·4.6(RESULT) 링크, 카드 5절 이름(허용 경로·허용 upstream 파일·금지 경로)과 PACKET 항목 이름의 일치 |
 | `.gitignore` | `work/handoff/**/*.jsonl`, `work/handoff/**/*-stderr.log` |
-| `G0-INFRA-T03` (CI) | 경로 필터가 `work/handoff/**`만 바뀐 커밋도 `work/evidence/**`와 같이 작업(job) 단위로 건너뜀 |
+| `G0-INFRA-T03` (CI) | 경로 필터가 `work/handoff/**`·`work/pmt/**`만 바뀐 커밋도 `work/evidence/**`와 같이 작업(job) 단위로 건너뜀 |

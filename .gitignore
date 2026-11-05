@@ -1,3 +1,5 @@
 .omc/
 work/handoff/**/*.jsonl
 work/handoff/**/*-stderr.log
+work/pmt/projects/*/.locks/
+work/pmt/.repo-locks/

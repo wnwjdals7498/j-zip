@@ -174,7 +174,7 @@ JZip.exe ─▶ 파일 로그 (LocalState\logs\)
 
 규칙:
 
-- **코드 커밋 SHA**: 매니페스트에는 기록 전용 커밋 직전의 마지막 코드 커밋 SHA를 적는다. **기록 전용 커밋**은 `work/handoff/**` 또는 `work/evidence/**`만 바꾸는 커밋이다([09](09-development-process.md) 7절, [12](12-agent-orchestration.md) 4.5). 기록 전용 커밋에서는 경로 필터 작업이 빌드·테스트 작업을 **작업(job) 단위로** 건너뛰고 성공으로 보고한다(워크플로 단위 `paths-ignore`는 필수 검사를 대기 상태로 남기므로 쓰지 않는다). CI는 매니페스트의 SHA가 "PR 머리에서 기록 전용 커밋을 뺀 커밋"과 같은지 검사한다([09](09-development-process.md) 7절).
+- **코드 커밋 SHA**: 매니페스트에는 기록 전용 커밋 직전의 마지막 코드 커밋 SHA를 적는다. **기록 전용 커밋**은 `work/handoff/**`, `work/evidence/**`, `work/pmt/**`만 바꾸는 커밋이다([09](09-development-process.md) 7절, [12](12-agent-orchestration.md) 4.5). 기록 전용 커밋에서는 경로 필터 작업이 빌드·테스트 작업을 **작업(job) 단위로** 건너뛰고 성공으로 보고한다(워크플로 단위 `paths-ignore`는 필수 검사를 대기 상태로 남기므로 쓰지 않는다). CI는 매니페스트의 SHA가 "PR 머리에서 기록 전용 커밋을 뺀 커밋"과 같은지 검사한다([09](09-development-process.md) 7절).
 - **외부 실행 기록 절**: `work/handoff/<작업 ID>/RUNLOG.md`가 있으면 `new-manifest.ps1`이 위 예시의 "외부 실행 기록" 절(역할별 모델, 실행 횟수, 마지막 판정, RUNLOG 링크)을 RUNLOG에서 생성한다. RUNLOG가 없으면 절을 쓰지 않는다. 이 기능은 `G0-INFRA-T07` 범위다.
 - **병합 뒤 추적**: squash 병합하면 매니페스트의 코드 커밋 SHA는 `main`에 남지 않지만 `refs/pull/<번호>/head`로 계속 도달할 수 있다. 병합 커밋 방식(subtree를 추가·갱신하는 PR, [09](09-development-process.md) 7절)은 코드 커밋이 `main` 이력에 그대로 남는다. CI 봇은 어느 방식이든 "보관본" 행에 `main`의 병합 SHA를 함께 적는다.
 - **명령 행**: 명령마다 빌드 구성과 정의(`JZIP_DEV_TRACE`, `JZIP_TEST_HOOKS`)를 적는다. 테스트 훅에 의존하는 묶음은 `Test` 구성으로, E3 코퍼스 증거는 `Release` 바이너리로 실행한다.

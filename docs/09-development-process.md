@@ -11,7 +11,7 @@ j-zip은 코딩 에이전트가 구현한다. 그래서 **무엇을 근거로 �
 | 명세 주도 | 모든 작업은 [05. 기능 세부 명세](05-feature-specs/README.md)의 요구사항 ID(`FR-17-5` 등)나 [06. GUI 명세서](06-gui-spec.md)의 요소 ID(`S2-04` 등)에서 출발한다. 명세에 없는 동작을 만들지 않는다 |
 | 증거로 완료 | "완료"는 주장이 아니라 증거다. 수용 기준(명세 8절)마다 정해진 종류의 증거가 있어야 완료로 본다 |
 | 작성과 검토 분리 | 코드를 쓴 에이전트는 자기 작업을 승인하지 않는다. 검토와 검증은 별도 에이전트(별도 컨텍스트)가 한다 |
-| 작게 | 작업 하나 = PR 하나 = 리뷰 가능한 크기(대략 변경 400줄 이하). 줄 수에서 빼는 것: 도구가 생성한 파일, 테스트 데이터 파일과 생성한 코퍼스, 외부 소스 가져오기(upstream subtree 등), `work/handoff/**`·`work/evidence/**`(12 4.5의 기록 전용 경로) |
+| 작게 | 작업 하나 = PR 하나 = 리뷰 가능한 크기(대략 변경 400줄 이하). 줄 수에서 빼는 것: 도구가 생성한 파일, 테스트 데이터 파일과 생성한 코퍼스, 외부 소스 가져오기(upstream subtree 등), `work/handoff/**`·`work/evidence/**`·`work/pmt/**`(12 4.5의 기록 전용 경로) |
 | 사실만 | 7-Zip 내부 동작은 [research](research/7zip-26.04-source-facts.md)나 실제 소스로 확인한 것만 근거로 쓴다. 모르면 "미결"로 남기고 결정 기록(ADR)을 요청한다 |
 
 ---
@@ -45,6 +45,7 @@ j-zip/
 ├─ work/
 │  ├─ tasks/             작업 카드
 │  ├─ decisions/         결정 기록 (ADR)
+│  ├─ pmt/               진행 상태·재개·차단·운영 결정 (PMT 데이터 루트, work/pmt/README.md)
 │  └─ evidence/          증거 매니페스트 (텍스트 + 축소 화면 PNG만, 큰 파일은 CI 아티팩트·릴리스 자산)
 ├─ packaging/            MSIX 매니페스트, 서명 설정
 ├─ docs/, design/
@@ -238,11 +239,11 @@ G2는 `jzip-shared`·`jzip-core` 로직과 CLI, G3는 기본 화면, G4는 P2, G
 | 항목 | 규칙 |
 |---|---|
 | 브랜치 | `<종류>/<작업 ID>-<짧은 이름>` 예) `feat/G2-F17-T03-encoding-score` |
-| 커밋 | Conventional Commits + 작업 ID. 예) `feat(shared): compute encoding candidate scores [G2-F17-T03]`. 증거 매니페스트는 코드 커밋과 섞지 않고 `work/evidence/**`만 바꾸는 커밋으로 따로 둔다. 외부 실행 기록(`work/handoff/**`)도 코드 커밋과 섞지 않는다 |
-| 기록 전용 커밋 | `work/handoff/**` 또는 `work/evidence/**`**만** 바꾸는 커밋. 이 두 경로 밖의 파일이 하나라도 있으면 기록 전용이 아니다([12](12-agent-orchestration.md) 4.5, [10](10-logging-evidence-operations.md) 3.3) |
+| 커밋 | Conventional Commits + 작업 ID. 예) `feat(shared): compute encoding candidate scores [G2-F17-T03]`. 증거 매니페스트는 코드 커밋과 섞지 않고 `work/evidence/**`만 바꾸는 커밋으로 따로 둔다. 외부 실행 기록(`work/handoff/**`)과 PMT 기록(`work/pmt/**`)도 코드·문서 커밋과 섞지 않는다 |
+| 기록 전용 커밋 | `work/handoff/**`, `work/evidence/**`, `work/pmt/**` 중 하나 이상**만** 바꾸는 커밋. 이 세 경로 밖의 파일이 하나라도 있으면 기록 전용이 아니다([12](12-agent-orchestration.md) 4.5, [10](10-logging-evidence-operations.md) 3.3) |
 | PR | 작업 하나당 하나. 템플릿: 근거(FR/AC), 변경 요약, **증거**, 남긴 임시 코드(있으면 이유), 미결 사항. 외부 모델이 한 작업이면 "외부 실행" 항목([12](12-agent-orchestration.md) 4.9) |
 | CI 경로 필터 | 기록 전용 커밋은 다시 빌드하지 않는다. 워크플로 단위 `paths-ignore`는 쓰지 않는다(필수 검사가 대기 상태로 남아 병합이 막힘). 대신 첫 작업(경로 필터 작업)이 바뀐 경로를 보고, 기록 전용이면 빌드·테스트 작업을 **작업(job) 단위로** 건너뛰며 필수 검사는 성공으로 보고한다. CI는 매니페스트에 적힌 코드 커밋 SHA가 "PR 머리에서 기록 전용 커밋을 뺀 마지막 커밋"과 같은지 검사한다 |
-| 병합 | 기본은 squash 병합. 병합 뒤에도 매니페스트의 코드 커밋 SHA는 `refs/pull/<번호>/head`로 도달할 수 있고, CI 봇이 "보관본" 행에 `main`의 병합 SHA를 함께 적는다([10](10-logging-evidence-operations.md) 3.3). **git subtree를 추가·갱신하는 PR(`G0-INFRA-T01`과 모든 `*-UPSTREAM-*` 작업)은 squash하지 않고 병합 커밋(merge commit)으로 병합한다.** `git-subtree-dir`·`git-subtree-split` trailer가 담긴 커밋이 `main` 이력에 남아야 다음 `git subtree pull`이 이전 가져오기를 찾는다. `main`에 직접 push와 강제 push 금지. 예외는 CI 봇의 증거 보관본 커밋 하나뿐이며 `work/evidence/**`만 바꿀 수 있다 |
+| 병합 | 기본은 squash 병합. 병합 뒤에도 매니페스트의 코드 커밋 SHA는 `refs/pull/<번호>/head`로 도달할 수 있고, CI 봇이 "보관본" 행에 `main`의 병합 SHA를 함께 적는다([10](10-logging-evidence-operations.md) 3.3). **git subtree를 추가·갱신하는 PR(`G0-INFRA-T01`과 모든 `*-UPSTREAM-*` 작업)은 squash하지 않고 병합 커밋(merge commit)으로 병합한다.** `git-subtree-dir`·`git-subtree-split` trailer가 담긴 커밋이 `main` 이력에 남아야 다음 `git subtree pull`이 이전 가져오기를 찾는다. `main`에 직접 push와 강제 push 금지. 직접 push의 예외는 두 가지다. CI 봇의 증거 보관본 커밋(`work/evidence/**`만)과 오케스트레이터의 PMT 기록 커밋(`work/pmt/**`만, [work/pmt/README.md](../work/pmt/README.md) 5절)이다. 강제 push는 예외 없이 금지 |
 | 금지 | 테스트 비활성화(`DISABLED_`, `GTEST_SKIP` 남용), 매니페스트가 참조하는 증거의 수정·삭제, 서명 인증서·비밀 커밋, 작업 범위 밖 수정 |
 | 허용 | 어떤 매니페스트도 참조하지 않는 로컬 진단 파일(임시 `.etl`, 덤프, 캡처 원본)은 지워도 된다. 매니페스트가 참조하는 항목은 업로드(CI 아티팩트·릴리스 자산)가 끝난 뒤에만 로컬에서 지운다 |
 
