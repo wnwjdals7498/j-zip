@@ -3,10 +3,10 @@ type: item
 kind: job
 id: j-zip/_default/Work1-3
 parent: j-zip/_default/Work1
-status: Planned
-updated: 2026-11-05
+status: In Progress
+updated: 2026-11-06
 blocked_by: []
-base_commit: -
+base_commit: 80b0494
 ---
 # [job] 초안 작업 카드 4장 검수(작성자와 다른 세션)
 ## 기본 내용

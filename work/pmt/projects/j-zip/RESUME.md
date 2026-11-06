@@ -1,14 +1,19 @@
-# RESUME - j-zip 생성 2026-11-05T10:52
+# RESUME - j-zip 생성 2026-11-06T16:19
 ## 요약
 - Goal: 7-Zip 26.04 포크 j-zip을 G0–G6 단계로 구현해 G6 출시 후보 게이트(docs/09 3절, docs/10 6절)를 통과한다
-- 활성 Work 1 · In Progress Item 0 · 점유 0 · 외부 대기 0
+- 활성 Work 1 · In Progress Item 2 · 점유 2 · 외부 대기 0
 
 ## 점유 중
 | 세션 | 대상 | heartbeat | 상태 |
 |---|---|---|---|
+| cc-9601c778 | j-zip/_default/Work1-3 | 2026-11-06T16:19 | active |
+| cc-9601c778 | j-zip/_default/Work1-2 | 2026-11-06T16:19 | active |
 
 ## 이어받을 항목 (heartbeat 최신순)
-- 없음
+### j-zip/_default/Work1-2 - [job] 기능 명세 미결 74건 분류와 결정 경로 연결
+<start 이후 note가 채움>
+### j-zip/_default/Work1-3 - [job] 초안 작업 카드 4장 검수(작성자와 다른 세션)
+<start 이후 note가 채움>
 
 ## 외부 대기
 - 없음
@@ -19,7 +24,7 @@
 - j-zip/G1/Work1 (work) - Work1: G1 시제품
 - j-zip/G1/Work1-7 (job) - [job] G1-SP6-T01 서명 인증서(Azure Trusted Signing 등) 자격·비용 조사
 - j-zip/G2/Work1 (work) - Work1: G2 로직 P1
-…7건 더
+…5건 더
 
 ## 승인 결정 최근 3
 - D1 PMT 기록 커밋 경로: main 직접 기록 전용 커밋: 결정: PMT 변경(work/pmt/**만)은 오케스트레이터가 main에 기록 전용 커밋으로 직접 커밋·push한다. (전문: decisions/D1.md)
@@ -32,5 +37,6 @@
 - j-zip___default__Work1-1.md: PMT를 레포 안 work/pmt/로 옮겨 운영 시작. docs/11 작업 113개를 G0–G6 Item으로 등록(선행 259건→blocked_by), 후속 Item 3건, 운영 규칙 work/pmt/README…
 
 ## 주의
-- 없음
+- j-zip/_default/Work1-2: resume block older than 24h or missing
+- j-zip/_default/Work1-3: resume block older than 24h or missing
 축소 적용: 없음

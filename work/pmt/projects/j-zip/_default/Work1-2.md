@@ -3,10 +3,10 @@ type: item
 kind: job
 id: j-zip/_default/Work1-2
 parent: j-zip/_default/Work1
-status: Planned
-updated: 2026-11-05
+status: In Progress
+updated: 2026-11-06
 blocked_by: []
-base_commit: -
+base_commit: 80b0494
 ---
 # [job] 기능 명세 미결 74건 분류와 결정 경로 연결
 ## 기본 내용
