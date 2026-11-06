@@ -11,3 +11,14 @@ created: 2026-11-06
 - session: cc-9601c778
 - note: 
 - worktree: 
+
+## 체크포인트 2026-11-06T16:21
+- 한 것: worktree ../j-zip-wt/pmt-Work1-2(docs/pmt-Work1-2-open-items-triage)에서 herdr jz-triage(agy flash)가 1부(F01-F17, 36건) 작성 중
+- 다음: 1부 검증 뒤 2부(F18-F36+OPS, 38건) 지시, 다른 모델 검토, Item blocked_by/backlog 등록
+- 주의: 없음
+
+## 검증 2026-11-06T16:44
+- python3 /tmp/claude-1000/-home-jjm-github-j-zip/9601c778-8e55-4c16-8128-4b53f20270e6/scratchpad/check_triage.py /home/jjm/github/j-zip-wt/pmt-Work1-2/docs/research/open-items-triage-2026-11.md '^(F\d\d|OPS):' | grep -qx 'rows 74 bad 1 dups 0' exit 0 @b91c5de 검사 스크립트는 세션 scratchpad에만 있다. bad 1은 64번 근거가 다른 작업 행(11:116)을 의도적으로 인용한 것. 분류표는 worktree docs/pmt-Work1-2-open-items-triage에 미커밋. 분류 판정은 codex gpt-6.1-terra가 독립 검토(22행 지적 중 21행 반영, 25번 차단은 a 분류라 유지)
+
+## 체크포인트 2026-11-06T16:44
+- pause
