@@ -22,3 +22,14 @@ created: 2026-11-06
 
 ## 체크포인트 2026-11-06T16:44
 - pause
+
+## 착수 2026-11-10T17:35
+- session: cc-3cc3558d
+- note: 
+- worktree: 
+
+## 검증 2026-11-10T17:40
+- bash /data/home/jjm/tmp/claude-1000/-data-workspace-github-j-zip/3cc3558d-cb54-4e95-b2c3-2c60885e2037/scratchpad/cardcheck.sh /home/jjm/github/j-zip-wt/pmt-Work1-3 exit 0 @2b854cc README 9절 기계 검사 3종 bash 동등 명령, ADR 금지어 포함. 검사 스크립트는 세션 scratchpad. 문서만 변경이라 빌드·테스트 대상 없음. PR #1
+
+## 체크포인트 2026-11-10T17:40
+- pause

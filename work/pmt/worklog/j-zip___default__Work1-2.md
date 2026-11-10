@@ -22,3 +22,14 @@ created: 2026-11-06
 
 ## 체크포인트 2026-11-06T16:44
 - pause
+
+## 착수 2026-11-10T17:35
+- session: cc-3cc3558d
+- note: 
+- worktree: 
+
+## 검증 2026-11-10T17:40
+- python3 -I /tmp/claude-1000/-home-jjm-github-j-zip/9601c778-8e55-4c16-8128-4b53f20270e6/scratchpad/check_triage.py docs/research/open-items-triage-2026-11.md '^(F\d\d|OPS):' | grep -q "class counts {'a': 19, 'b': 14, 'c': 37, '제외': 4}" exit 0 @c109870 74행 원문 대조(missing 0 extra 0)와 분류 수. 검사 스크립트는 이전 세션 /tmp에만 있음. PR #2
+
+## 체크포인트 2026-11-10T17:40
+- pause
