@@ -33,3 +33,15 @@ created: 2026-11-06
 
 ## 체크포인트 2026-11-10T17:40
 - pause
+
+## 착수 2026-11-11T10:37
+- session: cc-3cc3558d
+- note: 
+- worktree: 
+
+## 검증 2026-11-11T10:37
+- bash /data/home/jjm/tmp/claude-1000/-data-workspace-github-j-zip/3cc3558d-cb54-4e95-b2c3-2c60885e2037/scratchpad/cardcheck.sh /data/workspace/github/j-zip exit 0 @c57fe6f PR #1 병합 뒤 main(ed3f344 포함)에서 README 9절 기계 검사 3종 재실행. 문서만 변경이라 빌드·테스트 대상 없음
+
+## 결과 2026-11-11T10:37
+- 결과: 카드 4장 검수 완료(PR #1, ed3f344): 9절 기계 검사 통과, codex 지적 10건 중 8건 반영, 2건은 11 추가 요청 B1·B2. T08 kEpsilon 이견은 ADR-0001(m=round(score×1e6) 정수 비교)로 해소, F17 FR-17-10~12 보충. 개정 T01 r2·T03 r2·T08 r2·T09 r0.1. 카드 상태는 초안 유지(준비됨은 선행 완료 뒤)
+- 증거: 없음

@@ -3,10 +3,10 @@ type: item
 kind: job
 id: j-zip/_default/Work1-2
 parent: j-zip/_default/Work1
-status: In Progress
-updated: 2026-11-10
+status: Done
+updated: 2026-11-11
 blocked_by: []
-base_commit: bacef2e
+base_commit: c57fe6f
 ---
 # [job] 기능 명세 미결 74건 분류와 결정 경로 연결
 ## 기본 내용
@@ -20,18 +20,14 @@ base_commit: bacef2e
 - 74건 전부 분류·소유 작업이 적힌 표가 docs/05-feature-specs/README.md 또는 새 research 문서에 있다
 - G0–G2를 막는 건이 PMT에서 blocked_by 또는 backlog 행으로 조회된다(pmt find)
 ## 재개
-- 갱신: 2026-11-10T17:40 (session cc-3cc3558d)
-- 한 것: 분류표 커밋 c109870(origin/main 기준 rebase), PR #2 생성. Item 기본 내용을 실제 미결 70건으로 정정
-- 다음: PR #2 병합 뒤 end --done
-- 주의: 없음
-- 대기: 없음
-- 검증 못 한 것: 없음
+
 ## 검증
 | at | commit | criteria | command | exit | limits |
 |---|---|---|---|---|---|
 | 2026-11-06T16:44 | b91c5de | 7b0800e8 | python3 /tmp/claude-1000/-home-jjm-github-j-zip/9601c778-8e55-4c16-8128-4b53f20270e6/scratchpad/check_triage.py /home/jjm/github/j-zip-wt/pmt-Work1-2/docs/research/open-items-triage-2026-11.md '^(F\\d\\d\|OPS):' \| grep -qx 'rows 74 bad 1 dups 0' | 0 | 검사 스크립트는 세션 scratchpad에만 있다. bad 1은 64번 근거가 다른 작업 행(11:116)을 의도적으로 인용한 것. 분류표는 worktree docs/pmt-Work1-2-open-items-triage에 미커밋. 분류 판정은 codex gpt-6.1-terra가 독립 검토(22행 지적 중 21행 반영, 25번 차단은 a 분류라 유지) |
 | 2026-11-10T17:40 | c109870 | 7b0800e8 | python3 -I /tmp/claude-1000/-home-jjm-github-j-zip/9601c778-8e55-4c16-8128-4b53f20270e6/scratchpad/check_triage.py docs/research/open-items-triage-2026-11.md '^(F\\d\\d\|OPS):' \| grep -q "class counts {'a': 19, 'b': 14, 'c': 37, '제외': 4}" | 0 | 74행 원문 대조(missing 0 extra 0)와 분류 수. 검사 스크립트는 이전 세션 /tmp에만 있음. PR #2 |
+| 2026-11-11T10:37 | c57fe6f | 7b0800e8 | python3 -I /tmp/claude-1000/-home-jjm-github-j-zip/9601c778-8e55-4c16-8128-4b53f20270e6/scratchpad/check_triage.py docs/research/open-items-triage-2026-11.md '^(F\\d\\d\|OPS):' \| grep -q "class counts {'a': 19, 'b': 14, 'c': 37, '제외': 4}" | 0 | PR #2 병합 뒤 main(c57fe6f 포함)에서 74행 원문 대조와 분류 수 재실행. 검사 스크립트는 이전 세션 /tmp에만 있음 |
 ## 결과
--
+- 미결 74줄 분류표 docs/research/open-items-triage-2026-11.md 병합(PR #2, c57fe6f): a19 b14 c37 제외4, 실제 미결 70건. G0-G2 차단 5건은 backlog B3-B5, 11 추가 요청 B6
 ## 증거
 -

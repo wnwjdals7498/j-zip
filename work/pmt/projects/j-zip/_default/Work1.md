@@ -2,8 +2,8 @@
 type: work
 id: j-zip/_default/Work1
 parent: j-zip/_default
-status: In Progress
-updated: 2026-11-05
+status: Done
+updated: 2026-11-11
 ---
 # Work1: 기획 문서 정리
 ## Goal

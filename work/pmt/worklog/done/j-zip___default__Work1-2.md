@@ -33,3 +33,15 @@ created: 2026-11-06
 
 ## 체크포인트 2026-11-10T17:40
 - pause
+
+## 착수 2026-11-11T10:37
+- session: cc-3cc3558d
+- note: 
+- worktree: 
+
+## 검증 2026-11-11T10:37
+- python3 -I /tmp/claude-1000/-home-jjm-github-j-zip/9601c778-8e55-4c16-8128-4b53f20270e6/scratchpad/check_triage.py docs/research/open-items-triage-2026-11.md '^(F\d\d|OPS):' | grep -q "class counts {'a': 19, 'b': 14, 'c': 37, '제외': 4}" exit 0 @c57fe6f PR #2 병합 뒤 main(c57fe6f 포함)에서 74행 원문 대조와 분류 수 재실행. 검사 스크립트는 이전 세션 /tmp에만 있음
+
+## 결과 2026-11-11T10:37
+- 결과: 미결 74줄 분류표 docs/research/open-items-triage-2026-11.md 병합(PR #2, c57fe6f): a19 b14 c37 제외4, 실제 미결 70건. G0-G2 차단 5건은 backlog B3-B5, 11 추가 요청 B6
+- 증거: 없음
