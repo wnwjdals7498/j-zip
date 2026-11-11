@@ -83,7 +83,7 @@ j-zip의 모든 구현 작업은 [09 2절](../../docs/09-development-process.md)
 | NG-15 | `third_party/lz4/`, `third_party/unalz/` 소스 동봉 | G5-F08-T01(LZ4), G4-F07-T01(unalz) |
 | NG-16 | `upstream/7zip/` 안 파일의 수정(`JZIP-PATCH`). 이 카드에서 원본 변경은 0줄이다 | 각 기능 작업(예: G2-F17-T04) |
 | NG-17 | `THIRD_PARTY_NOTICES.md` 최종본, LGPL 소스 공개 링크 | G6-INFRA-T03 |
-| NG-18 | `spikes/`·`tests/scratch/` 안에 실제 파일을 만드는 일과 단계 종료 때의 정리(`.gitkeep` 외 파일 삭제). 이 카드는 두 폴더에 `.gitkeep`만 둔다 | 처음 그 폴더를 쓰는 작업(G1 시제품 작업), 단계 정리 G1-CLEANUP-T01 |
+| NG-18 | `spikes/`·`tests/scratch/` 안에 실제 파일을 만드는 일과 단계 종료 때의 정리(`.gitkeep` 외 파일 삭제). 이 카드는 두 폴더에 `.gitkeep`만 둔다 | `spikes/`: G1-SP1-T01, G1-SP2-T01, G1-SP3-T01, G1-SP4-T01, G1-SP5-T01([11](../../docs/11-implementation-backlog.md) 3절: 모든 시제품은 `spikes/<SP 번호>/`에서 만든다). `tests/scratch/`: 11에 소유 작업 없음. [09 2절](../../docs/09-development-process.md)은 이 폴더를 단계 종료 때 정리하는 탐색용 테스트 자리로만 정하고, 쓰는 작업은 자기 카드 5.1절에 적는다(작업이 아니라 폴더 사용 규칙이라 11 추가를 요청하지 않는다). 정리: 각 단계의 `G<n>-CLEANUP-T01`(G1은 `spikes/` 삭제) |
 | NG-19 | 줄 끝 정책 파일 `.gitattributes` | 소유 작업 없음. 09·10에 정책이 없다. 필요해지면 ADR로 정한다 |
 | NG-20 | `git subtree add` 실행, 출력 로그 저장, 해시·trailer 검증, RUNLOG 기록. 구현자는 이 일을 하지 않고 네트워크를 쓰지 않는다 | 오케스트레이터(7.1절 PRE-1·PRE-2, [12 4.10](../../docs/12-agent-orchestration.md)) |
 
@@ -526,6 +526,7 @@ docs(handoff): packet [G0-INFRA-T01]
 |---|---|---|---|
 | E1' | [10 3.1](../../docs/10-logging-evidence-operations.md)의 E1은 빌드 로그지만 빌드 도구(T02)와 CI(T03)가 아직 없다. 이 카드의 E1은 **레포 골격 검사 로그**로 대신한다([10 3.2](../../docs/10-logging-evidence-operations.md) "빌드할 코드가 없는 작업"의 규칙) | R-4, R-7의 명령 | `verify-before.log`(종료 코드 1), `verify-after.log`(종료 코드 0) |
 | 가져오기 기록 | 원본 가져오기(PRE-1·PRE-2)는 오케스트레이터가 실행하므로 구현자의 증거가 아니라 RUNLOG 항목이다 | PRE-1 | `work/handoff/G0-INFRA-T01/import-1.log`, `RUNLOG.md`의 `RUN-01 원본 가져오기`(오케스트레이터가 만든다) |
+| 완료 조건 기록 | 2절 GL-1·GL-3 중 8절 TC로 확인하지 않는 부분: DC-3(`.gitkeep` 17개 0바이트), DC-7(병합 뒤 `main` 이력의 trailer) | DC-3은 구현자가 실행한 확인 명령, DC-7은 9절의 `git log main --grep` 두 명령 | DC-3: `RESULT.md` "실행한 명령과 종료 코드". DC-7: 병합 뒤 오케스트레이터가 두 `git log main --grep` 출력의 줄 수가 각각 1 이상일 때만 종료 코드 0을 내는 검사 명령(예: `test "$(git log main --grep '^git-subtree-dir: upstream/7zip$' --oneline \| wc -l)" -ge 1 && test "$(git log main --grep '^git-subtree-split: 9128b80e3a471108678e2b3ec3c985861c8d7b0f$' --oneline \| wc -l)" -ge 1`)을 `pmt verify --run`으로 실행해 이 작업의 PMT Item(`pmt --project j-zip find G0-INFRA-T01`) `## 검증`에 남긴다 |
 | E9 | 검토 기록 | reviewer 검토, verifier 재현 | `REVIEW-<n>.md`, PR 코멘트(`JZIP-VERIFY task=G0-INFRA-T01 …`) |
 
 명령(PowerShell, 레포 루트에서):
@@ -631,3 +632,4 @@ $LASTEXITCODE
 |---|---|---|---|---|
 | r0 | 2026-10-14 | 전체 | 초안 작성 | |
 | r1 | 2026-10-14 | 0, 1.2, 2, 3, 4, 5, 6.1, 6.2, 6.3, 6.5, 6.7, 7, 8, 9, 10, 12, 13, 14 | 일관성 점검: 원본 가져오기를 오케스트레이터의 핸드오프 전 단계(PRE-1·PRE-2)로 이동하고 ST-2의 네트워크 조건 삭제, subtree PR은 병합 커밋으로 병합(trailer 복사 절차 삭제), 수용 기준을 09 3.2 #12로 지정, `spikes/`·`tests/scratch/`에 `.gitkeep`(폴더 18 → 20, `.gitkeep` 15 → 17), 수동 작성 매니페스트 첫 줄 규칙 | |
+| r2 | 2026-11-06 | 3, 10 | 검수(PMT `_default/Work1-3`, reviewer codex gpt-6.1-terra) 지적 반영: GL-1(DC-3)·GL-3(DC-7)을 10절 "완료 조건 기록" 행에 연결하고 DC-7은 일치 건수로 판정. NG-18 `spikes/` 소유 작업을 작업 ID로 구체화하고 `tests/scratch/`는 소유 작업이 없는 사실과 근거를 적음. NG-19(소유 작업 없음)는 11 작업 추가 요청으로 PMT backlog에 등록 | |
